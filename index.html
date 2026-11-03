@@ -216,6 +216,10 @@ input[type="text"], input[type="password"], input[type="number"], select, textar
 .pair-en { font-size: .82rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pair-note { font-size: .74rem; color: var(--warn); font-weight: 600; }
 
+.steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.steps li::marker { color: var(--accent); font-weight: 700; }
+.panel > .btn { justify-self: start; }
+
 /* Shadowing sentences */
 .sentences { display: grid; gap: 8px; }
 .sentence { display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; background: var(--sunk); }
@@ -976,8 +980,7 @@ MC_DATA.links = {
   ],
   tools: [
     { name: "Yoyo Chinese pinyin chart", note: "Hear every sound in all four tones", url: "https://yoyochinese.com/chinese-learning-tools/Mandarin-Chinese-pronunciation-lesson/pinyin-chart-table" },
-    { name: "Pleco", note: "Free dictionary app", url: "https://www.pleco.com/" },
-    { name: "HelloTalk", note: "Swap practice with Chinese speakers", url: "https://www.hellotalk.com/" }
+    { name: "Pleco", note: "Free dictionary app", url: "https://www.pleco.com/" }
   ]
 };
 
@@ -1578,6 +1581,22 @@ function renderShadowing(root, limit) {
   root.append(list);
 }
 
+// ---------- practising out loud with classmates ----------
+function classmatesPanel() {
+  const me = Cloud.me();
+  const label = me ? "Invite a classmate" : "Share the app with a friend";
+  const btn = el("button", { class: "btn", type: "button" }, label);
+  shareButton(btn, () => (me ? APP_URL + "?join=" + me.code : APP_URL),
+    me ? "Join my Mandarin class so we can practise together:" : "Let's learn Mandarin together with this free app:", label);
+  return el("div", { class: "panel" }, el("h3", {}, "Practise with your classmates"),
+    el("p", { class: "muted" }, me ? "Pair up with someone from " + (me.className || "your class") + ". Speaking to a real person makes the words stick." : "Studying with a friend keeps you both going. Speaking to a real person makes the words stick."),
+    el("ol", { class: "steps" },
+      el("li", {}, "Once a week, each of you picks 5 sentences from this drill."),
+      el("li", {}, "Send them to each other as voice messages in Messenger, said in Mandarin."),
+      el("li", {}, "Play your partner's messages and say each sentence back. If a tone sounds different from the recording here, tell them.")),
+    btn);
+}
+
 // ---------- speaking drill: read the English, say it in Mandarin out loud, then check against the recording ----------
 function mountSpeak(root) {
   root.replaceChildren();
@@ -1591,9 +1610,7 @@ function mountSpeak(root) {
     el("p", { class: "muted" }, "Read the English, say it out loud in Mandarin, then check yourself against the recording. Repeat it after the audio until it sounds the same."),
     el("div", { class: "split" }, el("p", { class: "label" }, "Speaking drill"), count),
     card));
-  root.append(el("div", { class: "panel" }, el("h3", {}, "Talk with real people"),
-    el("p", { class: "muted" }, "Once a week, swap voice messages with a Chinese speaker who wants to practise English. You help with their English, they help with your Mandarin."),
-    el("div", { class: "linkcards" }, linkCard(MC_DATA.links.tools[2]))));
+  root.append(classmatesPanel());
   const go = (d) => { at = (at + d + order.length) % order.length; draw(); };
   function draw() {
     const [, hz, py, en] = pool[order[at]];
