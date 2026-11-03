@@ -195,6 +195,7 @@ input[type="text"], input[type="password"], input[type="number"], select, textar
 .choice .contour { height: 34px; }
 .choice-py { font-size: 1.15rem; font-weight: 700; }
 .choice-num { font-size: .78rem; color: var(--muted); }
+.choice-en { font-size: .86rem; font-weight: 600; }
 .choice.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--surface)); }
 .choice.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)); }
 .result { width: 100%; max-width: 460px; }
@@ -1472,6 +1473,9 @@ function renderWords(root) {
 // ---------- tones: ear trainer, tone-pair cards, shadowing ----------
 const MA = ["", "mā", "má", "mǎ", "mà", "ma"];
 const TONE_NAME = ["", "1st", "2nd", "3rd", "4th", "neutral"];
+const TONE_SHAPE = ["", "flat", "rising", "dipping", "falling", "light"];
+// The classic "ma" set: one syllable, four tones, four different words.
+const MA_WORD = ["", "妈 mom", "麻 hemp", "马 horse", "骂 scold"];
 // Tone contour, drawn on the classic 5-level pitch scale.
 const CONTOUR = { 1: [[0, 5], [1, 5]], 2: [[0, 3], [1, 5]], 3: [[0, 2], [0.45, 1], [1, 4]], 4: [[0, 5], [1, 1]], 5: [[0.4, 2.5], [0.6, 2.5]] };
 function contourEl(tones) {
@@ -1526,7 +1530,8 @@ function mountToneTrainer(root) {
       const ts = k.split("-").map(Number);
       return el("button", { class: "choice", type: "button", "data-key": k, onclick: (e) => answer(k, e.currentTarget) },
         contourEl(ts), el("span", { class: "choice-py" }, ts.map((t) => MA[t]).join(" ")),
-        el("span", { class: "choice-num" }, ts.length === 1 ? TONE_NAME[ts[0]] + " tone" : ts.join(" + ")));
+        el("span", { class: "choice-num" }, ts.length === 1 ? TONE_NAME[ts[0]] + " tone · " + TONE_SHAPE[ts[0]] : ts.join(" + ")),
+        el("span", { class: "choice-en" }, ts.length === 1 ? MA_WORD[ts[0]] : ts.map((t) => TONE_SHAPE[t]).join(" + ")));
     }));
     Voice.word(word);
   }
@@ -2176,7 +2181,7 @@ function show(name, keepHash) {
 }
 function topStatus() {
   const n = learned().length, type = dayType();
-  $("#top-status").textContent = "Stage " + currentStage() + " · " + n + " words · " + (RUN ? "session in progress" : type === "session" ? "session day" : type === "off" ? "off day: 10-minute review" : "done for today");
+  $("#top-status").textContent = "Stage " + currentStage() + " · " + n + (n === 1 ? " word · " : " words · ") + (RUN ? "session in progress" : type === "session" ? "session day" : type === "off" ? "off day: 10-minute review" : "done for today");
 }
 document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => { show(t.dataset.view); window.scrollTo({ top: 0 }); }));
 document.addEventListener("mc:render", topStatus);
