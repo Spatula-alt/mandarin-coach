@@ -1360,13 +1360,14 @@ function mountCards(root, mode, onDone) {
     header();
     if (!queue.length) return finish();
     shown = false;
-    const w = queue[0], isNew = !S.cards[w.id];
+    const w = queue[0];
+    // A new word is being learned, not tested: show its sound and meaning straight away.
+    if (!S.cards[w.id]) return reveal();
     stage.replaceChildren(
       wordFace(w),
-      isNew ? el("div", { class: "answer" }, pinyinEl(w.py), el("p", { class: "muted small" }, "New word: say it out loud with the audio")) : el("p", { class: "muted small" }, "Say the pinyin and the meaning, then check"),
+      el("p", { class: "muted small" }, "Say the pinyin and the meaning, then check"),
       nav("Play"),
       el("button", { class: "btn primary big wide", type: "button", onclick: reveal }, "Show answer"));
-    if (isNew) Voice.word(w);
     document.dispatchEvent(new Event("mc:render"));
   }
   function reveal() {
@@ -1379,7 +1380,8 @@ function mountCards(root, mode, onDone) {
     stage.replaceChildren(
       wordFace(w),
       el("div", { class: "answer" }, pinyinEl(w.py), el("p", { class: "meaning" }, w.en), w.stage ? null : el("span", { class: "chip" }, "Your word"),
-        heard ? el("p", { class: "muted small" }, "Heard in: ", hanziEl(heard[0], heard[1]), " " + heard[1]) : null),
+        heard ? el("p", { class: "muted small" }, "Heard in: ", hanziEl(heard[0], heard[1]), " " + heard[1]) : null,
+        c ? null : el("p", { class: "muted small" }, "New word: listen, say it out loud, then rate how well you know it")),
       nav("Play again"),
       grades,
       el("p", { class: "muted small keys-hint" }, "Keys: 1–4 grade · R play again · ← previous · → next"));
