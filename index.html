@@ -20,210 +20,239 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Source+Sans+3:wght@400;600;700&family=Zilla+Slab:wght@600;700&display=swap">
 <style>
-/* Layout: one workbook column; flashcards sit in a 田字格 practice square; tone colours are the only loud colour. */
+/* Layout: one calm column, phone first. Flashcards sit in a 田字格 practice square; tone colours are the only loud colour. */
 :root {
-  --bg: #eef1ea;
-  --surface: #fafbf7;
-  --sunk: #e3e8df;
-  --ink: #1c231f;
-  --muted: #5b675f;
-  --line: #cfd7cc;
-  --accent: #2b3a67;
-  --accent-soft: #dfe4f2;
-  --on-accent: #ffffff;
-  --good: #2f7a46;
-  --warn: #a8620b;
-  --bad: #b23a2b;
-  --t1: #c73e2e;
-  --t2: #b8730f;
-  --t3: #2f8a4c;
-  --t4: #7347c2;
-  --t5: #7d8781;
-  --grid: #c9a9a2;
+  --bg: #eef1ea; --surface: #fafbf7; --sunk: #e3e8df; --ink: #1c231f; --muted: #5b675f; --line: #cfd7cc;
+  --accent: #2b3a67; --accent-soft: #dfe4f2; --on-accent: #ffffff;
+  --good: #2f7a46; --warn: #a8620b; --bad: #b23a2b;
+  --t1: #c73e2e; --t2: #b8730f; --t3: #2f8a4c; --t4: #7347c2; --t5: #7d8781; --grid: #c9a9a2;
   --font-display: "Zilla Slab", Rockwell, "Roboto Slab", Georgia, serif;
   --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --font-han: "Noto Serif SC", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
-  --radius: 10px;
+  --radius: 12px; --pad: 16px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121513; --surface: #1a1f1c; --sunk: #232a26; --ink: #e6ebe5; --muted: #9aa69e;
-    --line: #2f3833; --accent: #a9b8f0; --accent-soft: #283152; --on-accent: #10131f;
-    --good: #5cc07a; --warn: #e9a648; --bad: #f0745f;
+    --bg: #121513; --surface: #1a1f1c; --sunk: #232a26; --ink: #e6ebe5; --muted: #9aa69e; --line: #2f3833;
+    --accent: #a9b8f0; --accent-soft: #283152; --on-accent: #10131f; --good: #5cc07a; --warn: #e9a648; --bad: #f0745f;
     --t1: #f0715f; --t2: #eaa646; --t3: #5cc57b; --t4: #ae90ee; --t5: #98a29c; --grid: #6b4a45;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121513; --surface: #1a1f1c; --sunk: #232a26; --ink: #e6ebe5; --muted: #9aa69e;
-  --line: #2f3833; --accent: #a9b8f0; --accent-soft: #283152; --on-accent: #10131f;
-  --good: #5cc07a; --warn: #e9a648; --bad: #f0745f;
+  --bg: #121513; --surface: #1a1f1c; --sunk: #232a26; --ink: #e6ebe5; --muted: #9aa69e; --line: #2f3833;
+  --accent: #a9b8f0; --accent-soft: #283152; --on-accent: #10131f; --good: #5cc07a; --warn: #e9a648; --bad: #f0745f;
   --t1: #f0715f; --t2: #eaa646; --t3: #5cc57b; --t4: #ae90ee; --t5: #98a29c; --grid: #6b4a45;
   color-scheme: dark;
 }
+@media (min-width: 640px) { :root { --pad: 20px; } }
 
+/* Base: no sideways scrolling, no double-tap zoom, and 16px form text so iPhone doesn't zoom on tap */
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; overflow-x: hidden; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
 h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
-h2 { font-size: 1.6rem; }
-h3 { font-size: 1.15rem; }
+h2 { font-size: 1.5rem; } h3 { font-size: 1.15rem; }
 p { margin: 0; }
 a { color: var(--accent); }
 button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; }
+svg, img { max-width: 100%; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .han { font-family: var(--font-han); }
 .muted { color: var(--muted); }
 .small { font-size: .88rem; }
-.label { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.label { font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .num { font-variant-numeric: tabular-nums; }
+.view, .view > *, .panel > *, .card-stage > *, .trainer > * { min-width: 0; }
 
-.wrap { max-width: 780px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.top { padding-block: 18px 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.brand-mark { width: 46px; height: 46px; flex: none; display: grid; place-items: center; font-family: var(--font-han); font-size: 28px; font-weight: 700; color: var(--on-accent); background: var(--accent); border-radius: 8px; }
-.brand h1 { font-size: 1.45rem; }
-.save-state { font-size: .82rem; color: var(--muted); flex-basis: 100%; text-align: right; }
-.top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
-.btn.small { min-height: 36px; padding: 6px 12px; font-size: .9rem; }
-#install-tip .note { margin-block: 0 12px; }
+/* Header, tabs, toast */
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top { padding-block: 14px 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand > div { min-width: 0; }
+.brand-mark { width: 40px; height: 40px; flex: none; display: grid; place-items: center; font-family: var(--font-han); font-size: 24px; font-weight: 700; color: var(--on-accent); background: var(--accent); border-radius: 10px; }
+.brand h1 { font-size: 1.25rem; white-space: nowrap; }
+#top-status { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top-actions { display: flex; gap: 6px; flex: none; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 20; max-width: min(92vw, 460px);
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: .92rem; text-align: center; box-shadow: 0 6px 24px rgb(0 0 0 / .25); }
+@media (min-width: 641px) { .toast { bottom: 24px; } }
+#install-tip .note { margin-bottom: 10px; }
 
 .tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
-.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
-.tab { flex: 1 0 auto; border: 0; background: none; padding: 10px 12px 9px; border-bottom: 3px solid transparent; color: var(--muted); font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.tabs .wrap { display: flex; overflow-x: auto; scrollbar-width: none; }
+.tab { flex: 1 0 auto; border: 0; background: none; padding: 9px 10px 8px; border-bottom: 3px solid transparent; color: var(--muted); font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
 .tab .han { font-size: 1.05rem; line-height: 1.2; }
-.tab span:last-child { font-size: .78rem; }
+.tab span:last-child { font-size: .74rem; }
 .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 @media (max-width: 640px) {
   .tabs { position: fixed; top: auto; bottom: 0; left: 0; right: 0; border-bottom: 0; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .tabs .wrap { gap: 0; }
-  .tab { flex: 1 1 0; padding: 8px 2px; border-bottom: 0; border-top: 3px solid transparent; min-width: 0; }
+  .tabs .wrap { padding-left: max(4px, env(safe-area-inset-left, 0px)); padding-right: max(4px, env(safe-area-inset-right, 0px)); }
+  .tab { flex: 1 1 0; min-width: 0; padding: 7px 0 6px; border-bottom: 0; border-top: 3px solid transparent; }
   .tab[aria-selected="true"] { border-top-color: var(--accent); }
-  main { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+  main { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+  .top-actions .btn { padding: 6px 10px; }
 }
-main { padding-block: 20px 40px; }
-.view { display: grid; gap: 18px; }
+main { padding-block: 12px 40px; }
+.view { display: grid; gap: 14px; }
 
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: grid; gap: 12px; min-width: 0; }
+/* Panels and building blocks */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--pad); display: grid; gap: 14px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.split { display: flex; gap: 12px; justify-content: space-between; align-items: baseline; flex-wrap: wrap; }
-.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-.stat { background: var(--sunk); border-radius: 8px; padding: 12px; display: grid; gap: 2px; }
-.stat b { font-family: var(--font-display); font-size: 1.7rem; font-variant-numeric: tabular-nums; }
+.split { display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (min-width: 560px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+.stat { background: var(--sunk); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.note { background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; font-size: .92rem; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; background: var(--sunk); font-size: .8rem; font-weight: 600; white-space: nowrap; }
+.chip.good { color: var(--good); } .chip.warn { color: var(--warn); } .chip.bad { color: var(--bad); }
+.field { display: grid; gap: 4px; min-width: 0; }
+input[type="text"], input[type="password"], input[type="number"], select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-height: 46px; width: 100%; }
 
-.btn { border: 1px solid var(--line); background: var(--surface); padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; min-height: 44px; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 10px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center; }
 .btn:hover { border-color: var(--accent); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.btn.big { padding: 14px 22px; font-size: 1.05rem; }
-.btn.ghost { background: none; }
-.btn:disabled { opacity: .5; cursor: default; }
-.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--sunk); font-size: .82rem; font-weight: 600; }
-.chip.good { color: var(--good); } .chip.warn { color: var(--warn); } .chip.bad { color: var(--bad); }
-.note { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; font-size: .92rem; }
-input[type="text"], input[type="number"], select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-height: 44px; width: 100%; }
-textarea { resize: vertical; min-height: 64px; }
-.field { display: grid; gap: 4px; min-width: 0; }
+.btn.big { padding: 13px 22px; font-size: 1.05rem; }
+.btn.wide { width: 100%; max-width: 420px; }
+.btn.small { min-height: 36px; padding: 6px 12px; font-size: .88rem; }
+.btn.ghost { background: none; border-color: transparent; }
+.btn.ghost:hover { border-color: var(--line); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.play { color: var(--accent); }
+.speak { border: 0; background: none; cursor: pointer; padding: 6px; border-radius: 8px; color: var(--accent); min-width: 40px; min-height: 40px; display: inline-grid; place-items: center; }
+.speak:hover { background: var(--sunk); }
+
+/* Segmented controls (syllables, speed) */
+.seg-group { display: inline-flex; background: var(--sunk); border-radius: 10px; padding: 3px; gap: 2px; max-width: 100%; }
+.seg { border: 0; background: none; border-radius: 8px; padding: 7px 12px; font-weight: 600; font-size: .9rem; color: var(--muted); cursor: pointer; min-height: 36px; flex: 1 1 auto; white-space: nowrap; }
+.seg[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / .18); }
+.speed { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.view > .speed { justify-content: flex-end; }
+@media (max-width: 420px) { .speed .seg { padding: 7px 9px; font-size: .85rem; } }
 
 /* Tone colours */
 .t1 { color: var(--t1); } .t2 { color: var(--t2); } .t3 { color: var(--t3); } .t4 { color: var(--t4); } .t5 { color: var(--t5); }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .85rem; font-weight: 600; }
 
-/* Session runner */
-.today-hero { display: grid; gap: 14px; }
-.today-hero h2 { font-size: 2rem; }
+/* Today and the session runner */
+.today-hero { gap: 14px; }
+.today-hero h2 { font-size: 1.9rem; }
+.today-actions { display: grid; gap: 8px; }
+@media (min-width: 560px) { .today-actions { display: flex; flex-wrap: wrap; } }
 .blocks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.block { display: grid; grid-template-columns: 76px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 8px; background: var(--sunk); }
-.block .when { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
-.block.done { opacity: .55; }
-.block.now { background: var(--accent-soft); outline: 2px solid var(--accent); }
-.timer { font-family: var(--font-display); font-size: clamp(3rem, 14vw, 5rem); font-variant-numeric: tabular-nums; line-height: 1; }
+.block { display: grid; grid-template-columns: 70px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--sunk); }
+.block .when { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .82rem; }
+.block.done { opacity: .5; }
+.block.now { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+@media (max-width: 420px) { .block { grid-template-columns: 62px 1fr; } .block > :last-child { display: none; } }
+.runner h2 { font-size: 1.5rem; }
+.timer-row { display: grid; justify-items: center; gap: 2px; }
+.timer { font-family: var(--font-display); font-size: clamp(3rem, 16vw, 4.5rem); font-variant-numeric: tabular-nums; line-height: 1; }
 .timer.over { color: var(--warn); }
 .bar { height: 6px; background: var(--sunk); border-radius: 99px; overflow: hidden; }
 .bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s; }
+.runner-btns { display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+.runner .speed { justify-content: center; }
 .linkcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-.linkcard { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; text-decoration: none; color: var(--ink); background: var(--surface); }
+.linkcard { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--ink); background: var(--surface); }
 .linkcard:hover { border-color: var(--accent); }
 .linkcard b { color: var(--accent); }
 
-/* Flashcard in a 田字格 square */
-.card-stage { display: grid; justify-items: center; gap: 14px; text-align: center; }
-.tzg { position: relative; width: min(100%, 300px); aspect-ratio: 1; max-width: 100%; border: 2px solid var(--grid); background: var(--surface); display: grid; place-items: center; }
-.tzg::before, .tzg::after { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(var(--grid), var(--grid)) center / 100% 1px no-repeat, linear-gradient(var(--grid), var(--grid)) center / 1px 100% no-repeat; opacity: .55; }
+/* Flashcards in a 田字格 square */
+.card-stage { display: grid; justify-items: center; gap: 12px; text-align: center; }
+.tzg { position: relative; width: min(100%, 260px); aspect-ratio: 1; border: 2px solid var(--grid); border-radius: 4px; background: var(--surface); display: grid; place-items: center; }
+.tzg::before, .tzg::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.tzg::before { background: linear-gradient(var(--grid), var(--grid)) center / 100% 1px no-repeat, linear-gradient(var(--grid), var(--grid)) center / 1px 100% no-repeat; opacity: .55; }
 .tzg::after { background: linear-gradient(to top right, transparent calc(50% - .5px), var(--grid) 50%, transparent calc(50% + .5px)), linear-gradient(to top left, transparent calc(50% - .5px), var(--grid) 50%, transparent calc(50% + .5px)); opacity: .3; }
 .tzg .word { position: relative; z-index: 1; font-family: var(--font-han); font-weight: 700; line-height: 1.05; padding: 8px; overflow-wrap: anywhere; }
-.pinyin { font-size: 1.6rem; font-weight: 600; letter-spacing: .01em; }
-.meaning { font-size: 1.15rem; max-width: 40ch; }
+.pinyin { font-size: 1.5rem; font-weight: 600; }
+.meaning { font-size: 1.12rem; max-width: 36ch; }
 .answer { display: grid; gap: 6px; justify-items: center; }
-.grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 520px; }
-.grades .btn { padding: 8px 4px; display: grid; gap: 0; line-height: 1.2; }
-.grades .btn small { font-weight: 400; color: var(--muted); font-size: .75rem; }
+.card-nav { display: grid; grid-template-columns: 1fr 1.7fr 1fr; gap: 8px; width: 100%; max-width: 420px; }
+.card-nav .btn { white-space: nowrap; }
+.card-nav.two { grid-template-columns: 1fr 1fr; }
+.card-nav .btn { padding-inline: 8px; }
+.grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; max-width: 420px; }
+.grades .btn { padding: 8px 2px; display: grid; gap: 0; line-height: 1.2; }
+.grades .btn small { font-weight: 400; color: var(--muted); font-size: .74rem; }
 .grades .btn.again { border-color: var(--bad); }
+@media (hover: none) { .keys-hint { display: none; } }
 
-/* Tone trainer */
-.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; width: 100%; max-width: 560px; }
-.choice { font-size: 1.1rem; }
+/* Ear trainer */
+.trainer { display: grid; justify-items: center; gap: 22px; padding-top: 8px; }
+.trainer .choices:empty { display: none; }
+.play-big { display: inline-flex; align-items: center; gap: 10px; border: 0; border-radius: 999px; padding: 14px 26px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 1.05rem; cursor: pointer; min-height: 52px; }
+.play-big svg { width: 22px; height: 22px; }
+.choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 460px; }
+@media (min-width: 640px) { .choices { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 600px; } }
+.choice { display: grid; justify-items: center; gap: 2px; padding: 12px 6px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); cursor: pointer; min-width: 0; }
+.choice:hover { border-color: var(--accent); }
+.choice .contour { height: 34px; }
+.choice-py { font-size: 1.15rem; font-weight: 700; }
+.choice-num { font-size: .78rem; color: var(--muted); }
 .choice.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--surface)); }
 .choice.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)); }
-.contour { width: 120px; height: 46px; }
-.sentence { display: grid; gap: 4px; padding: 12px 14px; border-radius: 8px; background: var(--sunk); }
-.sentence .han { font-size: 1.45rem; }
+.result { width: 100%; max-width: 460px; }
+.result-card { display: grid; justify-items: center; gap: 4px; padding: 12px; border-radius: 12px; background: var(--sunk); text-align: center; }
+.result-card.is-right .label { color: var(--good); }
+.result-card.is-wrong .label { color: var(--bad); }
+.result-word { display: flex; align-items: center; gap: 4px; }
+.result-hz { font-size: 2.2rem; }
+.result-en { font-size: 1.05rem; }
 
-/* Chat */
-.chat { display: grid; gap: 10px; max-height: 60vh; overflow-y: auto; padding: 4px; }
-.msg { max-width: 88%; padding: 10px 14px; border-radius: 12px; display: grid; gap: 4px; min-width: 0; }
-.msg.them { background: var(--sunk); justify-self: start; border-bottom-left-radius: 4px; }
-.msg.me { background: var(--accent-soft); justify-self: end; border-bottom-right-radius: 4px; }
-.msg .han { font-size: 1.25rem; }
-.msg .fix { font-size: .9rem; border-left: 3px solid var(--warn); padding-left: 8px; }
-.composer { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+/* Tone pairs */
+.pair-row { font-weight: 700; margin-top: 4px; }
+.pair-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.pair-card { display: grid; justify-items: start; gap: 1px; text-align: left; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); cursor: pointer; min-width: 0; }
+.pair-card:hover { border-color: var(--accent); }
+.pair-tag { font-size: .74rem; font-weight: 700; color: var(--muted); }
+.pair-hz { font-size: 1.6rem; line-height: 1.2; }
+.pair-py { font-size: .95rem; font-weight: 600; }
+.pair-en { font-size: .82rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pair-note { font-size: .74rem; color: var(--warn); font-weight: 600; }
+
+/* Shadowing sentences */
+.sentences { display: grid; gap: 8px; }
+.sentence { display: grid; gap: 2px; padding: 12px 14px; border-radius: 12px; background: var(--sunk); }
+.sentence-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sentence-hz { font-size: 1.35rem; min-width: 0; }
+.sentence-btns { display: flex; align-items: center; gap: 2px; flex: none; }
+.sentence-py { font-size: .95rem; }
 
 /* Word list */
-.wordlist { display: grid; gap: 0; max-height: 70vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
-.wl-row { display: grid; grid-template-columns: minmax(64px, auto) minmax(90px, 1fr) 2fr auto; gap: 10px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.wordlist { display: grid; max-height: 70vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
+.wl-row { display: grid; grid-template-columns: minmax(56px, auto) minmax(80px, 1fr) 2fr auto; gap: 10px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .wl-row:last-child { border-bottom: 0; }
 .wl-row .han { font-size: 1.3rem; }
-@media (max-width: 520px) { .wl-row { grid-template-columns: auto 1fr auto; } .wl-row .wl-mean { grid-column: 1 / -1; } }
-.speak { border: 0; background: none; cursor: pointer; padding: 6px; border-radius: 6px; color: var(--accent); min-width: 36px; min-height: 36px; }
-.speak:hover { background: var(--sunk); }
+.wl-py { font-size: .95rem; }
+@media (max-width: 520px) { .wl-row { grid-template-columns: auto 1fr auto; row-gap: 0; } .wl-row .wl-mean { grid-column: 1 / -1; font-size: .9rem; color: var(--muted); } }
 
-/* Progress chart */
+/* Progress */
 .chart { width: 100%; height: auto; display: block; }
 .chart text { fill: var(--muted); font-size: 11px; font-family: var(--font-body); }
 .milestones { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .milestones li { display: grid; grid-template-columns: 90px 1fr auto; gap: 10px; align-items: center; }
-
-/* Tone pairs, study-day strip, misc */
-.pairs { border-collapse: collapse; width: 100%; min-width: 520px; }
-.pairs th, .pairs td { border: 1px solid var(--line); padding: 4px; text-align: center; }
-.pairs th { font-size: .85rem; padding: 6px; }
-.pair { border: 0; background: none; cursor: pointer; display: grid; justify-items: center; width: 100%; padding: 6px 2px; border-radius: 6px; }
-.pair:hover { background: var(--sunk); }
-.pair .han { font-size: 1.3rem; }
-.choice { display: grid; justify-items: center; gap: 2px; }
+@media (max-width: 420px) { .milestones li { grid-template-columns: 1fr auto; } .milestones li > span:not(.chip) { grid-column: 1 / -1; grid-row: 2; font-size: .88rem; color: var(--muted); } }
 .strip { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; max-width: 520px; }
-.day { display: inline-block; aspect-ratio: 1; min-width: 12px; border-radius: 4px; background: var(--sunk); border: 1px solid var(--line); }
+.day { display: inline-block; aspect-ratio: 1; min-width: 10px; border-radius: 4px; background: var(--sunk); border: 1px solid var(--line); }
 .day.some { background: var(--accent-soft); }
 .day.full { background: var(--accent); border-color: var(--accent); }
 .day.today { outline: 2px solid var(--ink); outline-offset: 1px; }
 .legend .day { width: 14px; height: 14px; vertical-align: -2px; }
 details.panel > summary { cursor: pointer; font-weight: 600; }
-.wl-py { font-size: .95rem; }
-.card-nav { justify-content: center; }
-.btn.play { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); }
-.btn svg, .speak svg { flex: none; display: block; }
-.speed { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
-.speed .seg { min-height: 36px; padding: 6px 12px; font-size: .9rem; }
-.speed .seg[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 /* Class sharing and the coach view */
 .join { border-color: var(--accent); }
 .invite { grid-template-columns: 1fr auto; align-items: center; }
 @media (max-width: 560px) { .invite { grid-template-columns: 1fr; } }
-.invite-text { display: grid; gap: 10px; min-width: 0; }
-.invite-link { font-family: ui-monospace, Consolas, monospace; font-size: .85rem; background: var(--sunk); padding: 8px 10px; border-radius: 6px; overflow-wrap: anywhere; }
-.qr { background: #fff; padding: 10px; border-radius: 8px; justify-self: center; line-height: 0; }
+.invite-text { display: grid; gap: 10px; }
+.invite-link { font-family: ui-monospace, Consolas, monospace; font-size: .85rem; background: var(--sunk); padding: 8px 10px; border-radius: 8px; overflow-wrap: anywhere; }
+.qr { background: #fff; padding: 10px; border-radius: 10px; justify-self: center; line-height: 0; }
 .qr img, .qr canvas { display: block; max-width: 100%; }
 .learner { display: grid; gap: 10px; padding-block: 14px; border-top: 1px solid var(--line); }
 .learner-name { font-size: 1.1rem; }
@@ -243,9 +272,9 @@ details.panel > summary { cursor: pointer; font-weight: 600; }
   <div class="top-actions">
     <button class="btn small" type="button" id="btn-install" hidden>Install app</button>
     <button class="btn small" type="button" id="btn-share">Share app</button>
-    <p class="save-state" id="save-state" role="status"></p>
   </div>
 </header>
+<p class="toast" id="save-state" role="status" hidden></p>
 <div class="wrap" id="install-tip" hidden></div>
 <nav class="tabs" aria-label="Sections">
   <div class="wrap" role="tablist">
@@ -1152,9 +1181,10 @@ function speakBtn(target, label = "Play") {
 // Speaking speed for every recording. Picking a speed replays `target` (a word, a sentence, or a function returning one).
 const SPEEDS = [[0.6, "Slower"], [0.8, "Slow"], [1, "Normal"], [1.25, "Fast"]];
 function speedControl(target) {
-  const group = el("div", { class: "speed", role: "group", "aria-label": "Speaking speed" }, el("span", { class: "label" }, "Speed"));
+  const segs = el("div", { class: "seg-group" });
+  const group = el("div", { class: "speed", role: "group", "aria-label": "Speaking speed" }, el("span", { class: "label" }, "Speed"), segs);
   for (const [s, name] of SPEEDS) {
-    group.append(el("button", { class: "btn seg", type: "button", "data-speed": s, "aria-pressed": String(s === Voice.speed()), title: s + "×", onclick: () => {
+    segs.append(el("button", { class: "seg", type: "button", "data-speed": s, "aria-pressed": String(s === Voice.speed()), title: s + "×", onclick: () => {
       Store.state.settings.speed = s; Store.save();
       document.querySelectorAll(".speed .seg").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.speed === s)));
       const t = typeof target === "function" ? target() : target;
@@ -1182,9 +1212,8 @@ const Store = {
   init() {
     const s = this.read();
     if (s) this.adopt(s);
-    let ok = true;
-    try { localStorage.setItem(LOCAL_KEY + "-probe", "1"); localStorage.removeItem(LOCAL_KEY + "-probe"); } catch { ok = false; }
-    status(ok ? "Progress saves in this browser" : "This browser can't save progress. Is it a private window?");
+    try { localStorage.setItem(LOCAL_KEY + "-probe", "1"); localStorage.removeItem(LOCAL_KEY + "-probe"); }
+    catch { status("This browser can't save progress. Is it a private window?"); }
   },
   save() {
     this.state.updatedAt = Date.now();
@@ -1220,7 +1249,14 @@ const Store = {
     return cards;
   },
 };
-function status(text) { const n = $("#save-state"); if (n) n.textContent = text; }
+// A short message that floats above the tab bar for a few seconds.
+function status(text) {
+  const n = $("#save-state");
+  if (!n) return;
+  n.textContent = text; n.hidden = !text;
+  clearTimeout(status.timer);
+  if (text) status.timer = setTimeout(() => (n.hidden = true), 4000);
+}
 
 // ---------- spaced repetition (day-based, SM-2 style) ----------
 const GRADES = [
@@ -1303,10 +1339,10 @@ function mountCards(root, mode, onDone) {
       el("p", { class: "muted small num" }, queue.length ? done + " done · " + queue.length + " left" : ""));
   }
   function nav(playLabel) {
-    return el("div", { class: "row card-nav" },
-      el("button", { class: "btn", type: "button", onclick: back, disabled: !history.length, title: "Previous word (← key)" }, "‹ Previous"),
+    return el("div", { class: "card-nav" },
+      el("button", { class: "btn", type: "button", onclick: back, disabled: !history.length, title: "Previous word (← key)" }, "‹ Back"),
       el("button", { class: "btn play", type: "button", onclick: () => Voice.word(queue[0]), title: "Hear it again (R key)" }, speakerIcon(), playLabel),
-      el("button", { class: "btn", type: "button", onclick: skip, disabled: queue.length < 2, title: "Skip it for now (→ key)" }, "Next ›"));
+      el("button", { class: "btn", type: "button", onclick: skip, disabled: queue.length < 2, title: "Skip it for now (→ key)" }, "Skip ›"));
   }
   function finish() {
     header();
@@ -1326,8 +1362,7 @@ function mountCards(root, mode, onDone) {
       wordFace(w),
       isNew ? el("div", { class: "answer" }, pinyinEl(w.py), el("p", { class: "muted small" }, "New word: say it out loud with the audio")) : el("p", { class: "muted small" }, "Say the pinyin and the meaning, then check"),
       nav("Play"),
-      el("button", { class: "btn primary big", type: "button", onclick: reveal }, "Show answer"),
-      speedControl(() => queue[0]));
+      el("button", { class: "btn primary big wide", type: "button", onclick: reveal }, "Show answer"));
     if (isNew) Voice.word(w);
     document.dispatchEvent(new Event("mc:render"));
   }
@@ -1344,8 +1379,7 @@ function mountCards(root, mode, onDone) {
         heard ? el("p", { class: "muted small" }, "Heard in: ", hanziEl(heard[0], heard[1]), " " + heard[1]) : null),
       nav("Play again"),
       grades,
-      speedControl(() => queue[0]),
-      el("p", { class: "muted small" }, "Keys: 1–4 grade · R play again · ← previous · → next"));
+      el("p", { class: "muted small keys-hint" }, "Keys: 1–4 grade · R play again · ← previous · → next"));
   }
   function grade(g) {
     const w = queue.shift();
@@ -1430,57 +1464,65 @@ function renderWords(root) {
   draw();
 }
 
-// ---------- tones: ear trainer, tone-pair chart, shadowing ----------
+// ---------- tones: ear trainer, tone-pair cards, shadowing ----------
 const MA = ["", "mā", "má", "mǎ", "mà", "ma"];
+const TONE_NAME = ["", "1st", "2nd", "3rd", "4th", "neutral"];
 // Tone contour, drawn on the classic 5-level pitch scale.
 const CONTOUR = { 1: [[0, 5], [1, 5]], 2: [[0, 3], [1, 5]], 3: [[0, 2], [0.45, 1], [1, 4]], 4: [[0, 5], [1, 1]], 5: [[0.4, 2.5], [0.6, 2.5]] };
 function contourEl(tones) {
   const w = 60 * tones.length, svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 " + w + " 46"); svg.setAttribute("class", "contour"); svg.setAttribute("aria-hidden", "true");
-  svg.style.width = (w * 0.9) + "px";
+  svg.style.width = (tones.length * 44) + "px";
   tones.forEach((t, i) => {
     const p = document.createElementNS(svg.namespaceURI, "polyline");
     p.setAttribute("points", CONTOUR[t].map(([x, y]) => (i * 60 + 8 + x * 44) + "," + (44 - y * 8)).join(" "));
-    p.setAttribute("fill", "none"); p.setAttribute("stroke", "var(--t" + t + ")"); p.setAttribute("stroke-width", "4"); p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
+    p.setAttribute("fill", "none"); p.setAttribute("stroke", "var(--t" + t + ")"); p.setAttribute("stroke-width", "5"); p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
     svg.append(p);
   });
   return svg;
 }
-// Words whose written tones match what you hear: no neutral tone, no 一/不 changes, no 3+3, no erhua.
+// Words whose written tones match what you hear: no neutral tone, no 一/不 changes, no 3+3, no erhua, no phrase recordings.
 function tonePool(syllables) {
   const ok = (w) => w.tones.length === syllables && w.tones.every((t) => t >= 1 && t <= 4) && !/[一不儿]/.test(w.hz) && !(syllables === 2 && w.tones[0] === 3 && w.tones[1] === 3) && [...w.hz].length === syllables && !Voice.carrier(w);
   const mine = learned().filter(ok);
   return mine.length >= 12 ? mine : WORDS.filter((w) => w.stage && w.stage <= Math.max(1, currentStage()) && ok(w));
 }
+function segmented(options, value, onPick, label) {
+  const group = el("div", { class: "seg-group", role: "group", "aria-label": label });
+  const draw = (v) => group.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === String(v))));
+  for (const [v, text] of options) group.append(el("button", { class: "seg", type: "button", "data-v": v, onclick: () => { draw(v); onPick(v); } }, text));
+  draw(value);
+  return group;
+}
+
 function mountToneTrainer(root) {
   root.replaceChildren();
-  let syl = Store.state.cards && learned().length > 40 ? 2 : 1, word = null, answered = false, right = 0, asked = 0;
-  const modeRow = el("div", { class: "row", role: "group", "aria-label": "Syllables" });
-  const play = el("div", { class: "row" });
+  let syl = learned().length > 40 ? 2 : 1, word = null, answered = false, right = 0, asked = 0;
+  const score = el("span", { class: "muted small num" }, "Hear a word, pick its tones");
+  const play = el("button", { class: "play-big", type: "button", onclick: () => (word && !answered ? Voice.word(word) : round()) }, speakerIcon(), el("span", {}, "Start"));
   const choices = el("div", { class: "choices" });
-  const out = el("div", { class: "answer", role: "status" });
-  const score = el("p", { class: "muted small num" });
-  root.append(el("div", { class: "split" }, el("p", { class: "label" }, "Ear trainer"), score), modeRow, el("div", { class: "card-stage" }, play, choices, out, speedControl(() => word)));
-  function modes() {
-    modeRow.replaceChildren(...[1, 2].map((n) => el("button", { class: "btn" + (syl === n ? " primary" : ""), type: "button", "aria-pressed": String(syl === n), onclick: () => { syl = n; modes(); round(); } }, n === 1 ? "One syllable" : "Two syllables")));
-  }
+  const out = el("div", { class: "result", role: "status" });
+  root.append(
+    el("div", { class: "panel-head" }, el("h3", {}, "Ear trainer"), score),
+    segmented([[1, "One syllable"], [2, "Two syllables"]], syl, (v) => { syl = +v; if (word) round(); }, "Syllables"),
+    el("div", { class: "trainer" }, choices, play, out));
   function round() {
-    const pool = tonePool(syl);
-    word = pick(pool); answered = false; out.replaceChildren();
-    play.replaceChildren(el("button", { class: "btn primary big", type: "button", onclick: () => Voice.word(word) }, "Play the word again"));
+    word = pick(tonePool(syl)); answered = false;
+    out.replaceChildren();
+    play.lastChild.textContent = "Play again";
     const key = word.tones.join("-");
-    let opts;
-    if (syl === 1) opts = ["1", "2", "3", "4"];
-    else {
-      const all = []; for (let a = 1; a <= 4; a++) for (let b = 1; b <= 4; b++) if (!(a === 3 && b === 3)) all.push(a + "-" + b);
+    let opts = ["1", "2", "3", "4"];
+    if (syl === 2) {
+      const all = [];
+      for (let a = 1; a <= 4; a++) for (let b = 1; b <= 4; b++) if (!(a === 3 && b === 3)) all.push(a + "-" + b);
       opts = shuffle([key, ...shuffle(all.filter((k) => k !== key)).slice(0, 3)]);
     }
     choices.replaceChildren(...opts.map((k) => {
       const ts = k.split("-").map(Number);
-      return el("button", { class: "btn choice", type: "button", "data-key": k, onclick: (e) => answer(k, e.currentTarget) },
-        contourEl(ts), el("span", {}, ts.map((t) => MA[t]).join(" + ")), el("small", { class: "muted" }, " (" + ts.join(" + ") + ")"));
+      return el("button", { class: "choice", type: "button", "data-key": k, onclick: (e) => answer(k, e.currentTarget) },
+        contourEl(ts), el("span", { class: "choice-py" }, ts.map((t) => MA[t]).join(" ")),
+        el("span", { class: "choice-num" }, ts.length === 1 ? TONE_NAME[ts[0]] + " tone" : ts.join(" + ")));
     }));
-    score.textContent = asked ? right + " of " + asked + " right" : "Listen, then pick the tones";
     Voice.word(word);
   }
   function answer(k, btn) {
@@ -1492,49 +1534,48 @@ function mountToneTrainer(root) {
     choices.querySelector('[data-key="' + key + '"]').classList.add("right");
     const st = (Store.state.toneStats[key] ||= { n: 0, ok: 0 }); st.n++; if (ok) st.ok++;
     Store.bump("tone"); Store.save();
-    out.replaceChildren(
-      el("p", { class: "label" }, ok ? "Right" : "Not quite. It was " + word.tones.join(" + ")),
-      hanziEl(word.hz, word.py, "han meaning"), pinyinEl(word.py), el("p", { class: "muted" }, word.en),
-      el("div", { class: "row" }, speakBtn(word, "Play"), el("button", { class: "btn primary", type: "button", onclick: round }, "Next")));
+    play.lastChild.textContent = "Next word";
+    out.replaceChildren(el("div", { class: "result-card " + (ok ? "is-right" : "is-wrong") },
+      el("p", { class: "label" }, ok ? "Right" : "Not quite: it was " + word.tones.map((t) => TONE_NAME[t]).join(" + ")),
+      el("div", { class: "result-word" }, hanziEl(word.hz, word.py, "han result-hz"), speakBtn(word, "Play")),
+      pinyinEl(word.py), el("p", { class: "result-en" }, word.en)));
     score.textContent = right + " of " + asked + " right";
-    document.dispatchEvent(new Event("mc:render"));
   }
-  modes();
-  play.append(el("button", { class: "btn primary big", type: "button", onclick: round }, "Start the ear trainer"));
-  score.textContent = "Hear a word, pick its tones";
 }
 
 function renderTonePairs(root) {
-  root.replaceChildren();
-  const table = el("table", { class: "pairs" });
-  const head = el("tr", {}, el("th", { scope: "col" }, ""), [1, 2, 3, 4, 5].map((b) => el("th", { scope: "col", class: "t" + b }, b === 5 ? "+ neutral" : "+ " + b)));
-  table.append(el("thead", {}, head));
-  const body = el("tbody");
+  root.replaceChildren(
+    el("div", { class: "panel-head" }, el("h3", {}, "Tone pairs")),
+    el("p", { class: "muted small" }, "Most words have two syllables, so practise tones in pairs. Tap a word, listen, then say it back. When two 3rd tones meet, the first is said as a 2nd tone: 你好 sounds like ní hǎo."));
   for (let a = 1; a <= 4; a++) {
-    const tr = el("tr", {}, el("th", { scope: "row", class: "t" + a }, a + " +"));
+    const grid = el("div", { class: "pair-grid" });
     for (let b = 1; b <= 5; b++) {
       const w = WORDS.find((x) => x.stage && x.tones.length === 2 && x.tones[0] === a && x.tones[1] === b && [...x.hz].length === 2 && !/[一不]/.test(x.hz));
-      tr.append(el("td", {}, w ? el("button", { class: "pair", type: "button", onclick: () => Voice.word(w), title: w.en },
-        hanziEl(w.hz, w.py), pinyinEl(w.py, "small"), a === 3 && b === 3 ? el("small", { class: "muted" }, "said 2 + 3") : null) : "–"));
+      if (!w) continue;
+      grid.append(el("button", { class: "pair-card", type: "button", onclick: () => Voice.word(w), "aria-label": w.hz + ", " + w.py + ", " + w.en },
+        el("span", { class: "pair-tag" }, el("span", { class: "t" + a }, String(a)), " + ", el("span", { class: "t" + b }, b === 5 ? "neutral" : String(b))),
+        hanziEl(w.hz, w.py, "han pair-hz"), pinyinEl(w.py, "pair-py"), el("span", { class: "pair-en" }, w.en),
+        a === 3 && b === 3 ? el("span", { class: "pair-note" }, "said 2 + 3") : null));
     }
-    body.append(tr);
+    root.append(el("p", { class: "pair-row" }, el("span", { class: "t" + a }, TONE_NAME[a] + " tone"), " first"), grid);
   }
-  table.append(body);
-  root.append(el("p", { class: "label" }, "Tone pairs"), el("p", { class: "muted small" }, "Most words have two syllables, so drill tones in pairs. Tap a word, then say it back. Two 3rd tones together: the first one becomes a 2nd tone (你好 is said ní hǎo)."), el("div", { style: "overflow-x:auto" }, table));
 }
 
 function renderShadowing(root, limit) {
   root.replaceChildren();
   const stage = currentStage();
-  const list = MC_DATA.sentences.filter(([s]) => s <= stage).concat(MC_DATA.sentences.filter(([s]) => s === stage + 1));
-  const items = limit ? shuffle(list.filter(([s]) => s <= stage)).slice(0, limit) : list;
-  root.append(el("p", { class: "label" }, "Shadowing"), el("p", { class: "muted small" }, "Play a sentence, pause, then repeat it out loud copying the melody. Do each one three times. The Slow button is a separate slow recording."), speedControl(null));
+  const mine = MC_DATA.sentences.filter(([s]) => s <= stage), next = MC_DATA.sentences.filter(([s]) => s === stage + 1);
+  const items = limit ? shuffle(mine).slice(0, limit) : mine.concat(next);
+  root.append(el("div", { class: "panel-head" }, el("h3", {}, "Shadowing")),
+    el("p", { class: "muted small" }, "Play a sentence, then repeat it out loud copying the melody. Do each one three times. Slow plays a separate slow recording."));
+  const list = el("div", { class: "sentences" });
   for (const [s, hz, py, en] of items) {
-    root.append(el("div", { class: "sentence" },
-      el("div", { class: "split" }, el("span", { class: "han", lang: "zh-CN" }, hz), el("div", { class: "row" }, speakBtn(hz, "Play"), el("button", { class: "btn ghost small", type: "button", onclick: () => Voice.say(hz, 0.55) }, "Slow"))),
-      pinyinEl(py, "small"), el("span", { class: "muted small" }, en + (s > stage ? " · next stage" : ""))));
+    list.append(el("div", { class: "sentence" },
+      el("div", { class: "sentence-top" }, el("span", { class: "han sentence-hz", lang: "zh-CN" }, hz),
+        el("div", { class: "sentence-btns" }, speakBtn(hz, "Play"), el("button", { class: "btn small ghost", type: "button", onclick: () => Voice.say(hz, 0.55) }, "Slow"))),
+      pinyinEl(py, "sentence-py"), el("span", { class: "muted small" }, en + (s > stage ? " · next stage" : ""))));
   }
-  document.dispatchEvent(new Event("mc:render"));
+  root.append(list);
 }
 
 // ---------- speaking drill: read the English, say it in Mandarin out loud, then check against the recording ----------
@@ -1571,10 +1612,9 @@ function mountSpeak(root) {
       el("p", { class: "meaning" }, en),
       el("p", { class: "muted small" }, "Say it out loud first."),
       check, answer,
-      el("div", { class: "row card-nav" },
+      el("div", { class: "card-nav two" },
         el("button", { class: "btn", type: "button", onclick: () => go(-1) }, "‹ Previous"),
-        el("button", { class: "btn", type: "button", onclick: () => go(1) }, "Next ›")),
-      speedControl(() => (shown ? hz : null)));
+        el("button", { class: "btn", type: "button", onclick: () => go(1) }, "Next ›")));
     document.dispatchEvent(new Event("mc:render"));
   }
   draw();
@@ -1604,7 +1644,9 @@ function setupInstall() {
       if (choice.outcome === "accepted") btn.hidden = true;
       return;
     }
-    installTip(isIOS ? "On iPhone or iPad: open this page in Safari, tap the Share button, then “Add to Home Screen”."
+    const inApp = /FBAN|FBAV|Messenger|Instagram|Line\//i.test(navigator.userAgent);
+    installTip(inApp ? "You're inside Messenger's browser, which can't install apps. Tap ••• and choose “Open in browser” (Safari or Chrome), then install from there."
+      : isIOS ? "On iPhone or iPad: open this page in Safari, tap the Share button, then “Add to Home Screen”."
       : "Open your browser's menu (⋮) and choose “Install app” or “Add to Home screen”.");
   });
 }
@@ -1912,7 +1954,7 @@ function renderToday(root) {
       el("div", { class: "stat" }, el("span", { class: "label" }, "New words ready"), el("b", {}, Math.min(fresh, S.settings.newPerSession))),
       el("div", { class: "stat" }, el("span", { class: "label" }, "Words learned"), el("b", {}, learned().length)),
       el("div", { class: "stat" }, el("span", { class: "label" }, "Sessions"), el("b", {}, S.sessions.filter((x) => x.plan !== "review").length))),
-    el("div", { class: "row" },
+    el("div", { class: "today-actions" },
       el("button", { class: "btn big" + (type === "session" ? " primary" : ""), type: "button", onclick: () => start("full") }, "Start 90-minute session"),
       el("button", { class: "btn", type: "button", onclick: () => start("short") }, "45-minute version"),
       el("button", { class: "btn" + (type !== "session" ? " primary big" : ""), type: "button", onclick: () => start("review") }, "10-minute review"))));
@@ -1945,8 +1987,9 @@ function renderRunner(root) {
     RUN.i++; RUN.blockStart = Date.now(); if (RUN.paused) { RUN.pausedMs += Date.now() - RUN.paused; RUN.paused = null; }
     writeRun(RUN); renderToday(root); window.scrollTo({ top: 0 });
   } }, last ? "Finish session" : "Next: " + BLOCKS[plan.blocks[RUN.i + 1][0]].title);
-  const end = el("button", { class: "btn ghost", type: "button", onclick: () => finishRun(root) }, "End early");
+  const end = el("button", { class: "btn small ghost", type: "button", onclick: () => finishRun(root) }, "End early");
   function update() {
+    if (!RUN) return clearInterval(tick);
     const now = RUN.paused || Date.now(), left = min * 60 - (now - RUN.blockStart) / 1000;
     timer.textContent = mmss(left); timer.classList.toggle("over", left < 0);
     fill.style.width = Math.min(100, (1 - left / (min * 60)) * 100) + "%";
@@ -1954,12 +1997,14 @@ function renderRunner(root) {
   }
   const body = el("div", { class: "view" });
   root.append(
-    el("div", { class: "panel" },
-      el("div", { class: "split" }, el("p", { class: "label" }, plan.name + " · block " + (RUN.i + 1) + " of " + plan.blocks.length), end),
+    el("div", { class: "panel runner" },
+      el("div", { class: "panel-head" }, el("p", { class: "label" }, plan.name + " · " + (RUN.i + 1) + " of " + plan.blocks.length), end),
       el("h2", {}, el("span", { class: "han", lang: "zh-CN" }, b.zh), " ", b.title),
-      el("p", {}, b.tip),
-      el("div", { class: "split" }, timer, el("div", { class: "row" }, pauseBtn, next)),
-      el("div", { class: "bar" }, fill), msg),
+      el("p", { class: "muted" }, b.tip),
+      el("div", { class: "timer-row" }, timer, msg),
+      el("div", { class: "bar" }, fill),
+      el("div", { class: "runner-btns" }, pauseBtn, next),
+      speedControl(null)),
     body,
     el("details", { class: "panel" }, el("summary", {}, "Session plan"), blockPlanList(RUN.plan, RUN.i)));
   update(); tick = setInterval(() => (root.isConnected ? update() : clearInterval(tick)), 1000);
@@ -2076,10 +2121,10 @@ function renderProgress(root) {
 // ---------- tabs ----------
 const VIEWS = {
   today: renderToday,
-  cards: (r) => { r.replaceChildren(); const p = el("div", { class: "panel" }), q = el("div", { class: "panel" }); r.append(p, q); mountCards(p, "due"); q.append(el("h3", {}, "Learn new words"), el("p", { class: "muted" }, "Normally part of each session. Start here if you want extra."), el("button", { class: "btn", type: "button", onclick: () => mountCards(q, "new") }, "Learn " + Store.state.settings.newPerSession + " new words")); },
-  tones: (r) => { r.replaceChildren(); const a = el("div", { class: "panel" }), b = el("div", { class: "panel" }), c = el("div", { class: "panel" }); r.append(a, b, c); mountToneTrainer(a); renderTonePairs(b); renderShadowing(c); },
-  speak: mountSpeak,
-  words: renderWords,
+  cards: (r) => { r.replaceChildren(speedControl(null)); const p = el("div", { class: "panel" }), q = el("div", { class: "panel" }); r.append(p, q); mountCards(p, "due"); q.append(el("h3", {}, "Learn new words"), el("p", { class: "muted" }, "Normally part of each session. Start here if you want extra."), el("button", { class: "btn", type: "button", onclick: () => mountCards(q, "new") }, "Learn " + Store.state.settings.newPerSession + " new words")); },
+  tones: (r) => { r.replaceChildren(speedControl(null)); const a = el("div", { class: "panel" }), b = el("div", { class: "panel" }), c = el("div", { class: "panel" }); r.append(a, b, c); mountToneTrainer(a); renderTonePairs(b); renderShadowing(c); },
+  speak: (r) => { mountSpeak(r); r.prepend(speedControl(null)); },
+  words: (r) => { renderWords(r); r.prepend(speedControl(null)); },
   progress: renderProgress,
   coach: renderCoach,
 };
