@@ -1992,7 +1992,10 @@ function voiceNote(root) {
 
 // ---------- session runner ----------
 function renderRunner(root) {
-  const plan = PLANS[RUN.plan], [id, min] = plan.blocks[RUN.i], b = BLOCKS[id];
+  const plan = PLANS[RUN.plan], [id, min] = plan.blocks[RUN.i];
+  // A review block with no words due turns into ear training instead of an empty screen.
+  const emptyReview = id === "review" && !dueCards().length;
+  const b = emptyReview ? { title: "Ear training", zh: "声调", tip: "No words are due for review today, so use this time to train your ear: listen, then pick the tones." } : BLOCKS[id];
   const timer = el("div", { class: "timer num", role: "timer", "aria-label": "Time left in this block" });
   const fill = el("i"), msg = el("p", { class: "muted small" });
   const pauseBtn = el("button", { class: "btn", type: "button", onclick: () => {
@@ -2028,7 +2031,19 @@ function renderRunner(root) {
     el("details", { class: "panel" }, el("summary", {}, "Session plan"), blockPlanList(RUN.plan, RUN.i)));
   update(); tick = setInterval(() => (root.isConnected ? update() : clearInterval(tick)), 1000);
   const panel = (...kids) => el("div", { class: "panel" }, ...kids);
-  if (id === "review") { const p = panel(); body.append(p); mountCards(p, "due"); }
+  if (id === "review" && emptyReview) { const t = panel(); body.append(t); mountToneTrainer(t); }
+  else if (id === "review") {
+    // Reviews finished with time left: the ear trainer fills the rest of the block.
+    const p = panel(), t = panel();
+    t.hidden = true;
+    body.append(p, t);
+    mountCards(p, "due", () => {
+      if (!t.hidden) return;
+      t.hidden = false;
+      mountToneTrainer(t);
+      t.prepend(el("p", { class: "note" }, "Reviews done with time to spare. Train your ear until the timer runs out."));
+    });
+  }
   else if (id === "new") { const p = panel(); body.append(p); mountCards(p, "new"); }
   else if (id === "tones") { const a = panel(), s = panel(); body.append(a, s); mountToneTrainer(a); renderShadowing(s, 5); }
   else if (id === "speak") { const p = el("div", { class: "view" }); body.append(p); mountSpeak(p); }

@@ -1,5 +1,5 @@
 // Offline support: the page and its recordings are kept on the device after the first visit.
-const CACHE = "mandarin-coach-6ff1a0d10d";
+const CACHE = "mandarin-coach-4893d6db74";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png"];
 
 self.addEventListener("install", (e) => {
