@@ -14,11 +14,11 @@
 <style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<title>Mandarin Coach</title>
-<meta name="description" content="Learn Mandarin in 90-minute sessions: flashcards with recorded audio, a tone trainer and speaking practice.">
+<title>Language Coach</title>
+<meta name="description" content="Learn Mandarin, Spanish or Japanese in 90-minute sessions: flashcards with recorded audio, tone and kana trainers, and speaking practice.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Source+Sans+3:wght@400;600;700&family=Zilla+Slab:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Serif+JP:wght@500;700&family=Source+Sans+3:wght@400;600;700&family=Zilla+Slab:wght@600;700&display=swap">
 <style>
 /* Layout: one calm column, phone first. Flashcards sit in a 田字格 practice square; tone colours are the only loud colour. */
 :root {
@@ -263,6 +263,42 @@ details.panel > summary { cursor: pointer; font-weight: 600; }
 .learner-name { font-size: 1.1rem; }
 .bars { width: 140px; height: 36px; display: block; }
 
+/* Language switch and per-language type */
+#course-select { width: auto; min-height: 36px; padding: 4px 28px 4px 10px; border-radius: 10px; font-weight: 600; background-color: var(--sunk); border-color: var(--line); }
+/* Phones: title on its own line, the language switch and buttons on the line below */
+@media (max-width: 560px) {
+  .top { flex-wrap: wrap; }
+  .top-actions { width: 100%; }
+  #course-select { flex: 1 1 auto; min-width: 0; }
+}
+:root[data-course="ja"] { --font-han: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif; }
+:root[data-course="es"] { --font-han: var(--font-display); }
+.tzg.plain { aspect-ratio: auto; min-height: 150px; border-style: solid; padding: 18px 12px; }
+.tzg.plain::before, .tzg.plain::after { display: none; }
+.tzg.plain .word { font-family: var(--font-display); font-weight: 700; line-height: 1.15; text-align: center; }
+.reading { display: inline-flex; flex-direction: column; align-items: center; gap: 0; }
+.reading .romaji { font-size: .78em; font-weight: 600; color: var(--muted); }
+.sentence .reading, .answer .reading { align-items: flex-start; }
+.answer .reading { align-items: center; }
+
+/* Kana and kanji */
+.kana-face { font-family: var(--font-han); font-size: clamp(4.5rem, 26vw, 7rem); font-weight: 700; line-height: 1.1; min-height: 1.2em; text-align: center; }
+.kana-charts { display: grid; gap: 10px; }
+.kana-grid { display: grid; gap: 6px; }
+.kana-cell { display: grid; justify-items: center; gap: 0; padding: 8px 2px 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); cursor: pointer; min-width: 0; }
+.kana-cell:hover { border-color: var(--accent); }
+.kana-cell.empty { border: 0; background: none; cursor: default; }
+.kana-ch { font-family: var(--font-han); font-size: 1.6rem; line-height: 1.2; }
+.kana-ro { font-size: .78rem; color: var(--muted); font-weight: 600; }
+.kanji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.kanji-card { display: grid; justify-items: center; gap: 1px; padding: 10px 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); cursor: pointer; text-align: center; min-width: 0; }
+.kanji-card:hover { border-color: var(--accent); }
+.kanji-ch { font-family: var(--font-han); font-size: 2.1rem; line-height: 1.15; }
+.kanji-en { font-size: .82rem; font-weight: 600; }
+.kanji-rd { font-size: .74rem; color: var(--muted); overflow-wrap: anywhere; }
+.learner-course { display: grid; gap: 10px; padding: 12px; border-radius: 12px; background: var(--sunk); }
+.learner-course .stat { background: var(--surface); }
+
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 </style>
@@ -270,11 +306,12 @@ details.panel > summary { cursor: pointer; font-weight: 600; }
   <div class="brand">
     <div class="brand-mark" aria-hidden="true">学</div>
     <div>
-      <h1>Mandarin Coach</h1>
+      <h1>Language Coach</h1>
       <p class="muted small" id="top-status">90 minutes, every other day</p>
     </div>
   </div>
   <div class="top-actions">
+    <select id="course-select" aria-label="Language you are learning"></select>
     <button class="btn small" type="button" id="btn-install" hidden>Install app</button>
     <button class="btn small" type="button" id="btn-share">Share app</button>
   </div>
@@ -285,7 +322,7 @@ details.panel > summary { cursor: pointer; font-weight: 600; }
   <div class="wrap" role="tablist">
     <button class="tab" role="tab" id="tab-today" data-view="today"><span class="han">今天</span><span>Today</span></button>
     <button class="tab" role="tab" id="tab-cards" data-view="cards"><span class="han">卡片</span><span>Cards</span></button>
-    <button class="tab" role="tab" id="tab-tones" data-view="tones"><span class="han">声调</span><span>Tones</span></button>
+    <button class="tab" role="tab" id="tab-script" data-view="script"><span class="han">声调</span><span>Tones</span></button>
     <button class="tab" role="tab" id="tab-speak" data-view="speak"><span class="han">说话</span><span>Speak</span></button>
     <button class="tab" role="tab" id="tab-words" data-view="words"><span class="han">词语</span><span>Words</span></button>
     <button class="tab" role="tab" id="tab-progress" data-view="progress"><span class="han">进步</span><span>Progress</span></button>
@@ -295,17 +332,56 @@ details.panel > summary { cursor: pointer; font-weight: 600; }
 <main class="wrap" id="main">
   <section class="view" id="view-today" hidden></section>
   <section class="view" id="view-cards" hidden></section>
-  <section class="view" id="view-tones" hidden></section>
+  <section class="view" id="view-script" hidden></section>
   <section class="view" id="view-speak" hidden></section>
   <section class="view" id="view-words" hidden></section>
   <section class="view" id="view-progress" hidden></section>
   <section class="view" id="view-coach" hidden></section>
 </main>
 <script>
+// The three courses. Each keeps its own words, recordings, progress and session plan; the page loads one at a time.
+window.MC_COURSES = window.MC_COURSES || {};
+const COURSE_META = {
+  zh: {
+    id: "zh", name: "Mandarin", native: "中文", lang: "zh-CN", script: "tones",
+    storeKey: "mandarin-coach-v1", runKey: "mandarin-coach-running",
+    stageNote: "stages 1 to 3 follow the classic HSK 1–3 lists",
+    readingLabel: "Pinyin", readingHint: "ni3 hao3 or nǐ hǎo",
+    lessonNote: "Months 1–3: HelloChinese. From month 4: Chinese Zero to Hero's HSK courses (HSK 2, then 3).",
+    inputNote: "Months 1–2: Du Chinese's easiest stories. Add Mandarin Corner from month 3.",
+    tabs: { today: "今天", cards: "卡片", script: "声调", speak: "说话", words: "词语", progress: "进步", coach: "老师" },
+    blocks: { review: "复习", tones: "声调", lesson: "新课", break: "休息", input: "听和读", speak: "说话", new: "生词" },
+  },
+  es: {
+    id: "es", name: "Spanish", native: "Español", lang: "es-MX", script: null,
+    storeKey: "language-coach-es-v1", runKey: "language-coach-es-running",
+    stageNote: "stages 1 to 3 are the most-used everyday words (about level A1–A2), Latin American Spanish",
+    readingLabel: "", readingHint: "",
+    lessonNote: "Start with Language Transfer's Complete Spanish (free audio). Use SpanishDict for grammar questions.",
+    inputNote: "Watch Dreaming Spanish's easiest videos first. Add Easy Spanish street interviews from month 3.",
+    tabs: { today: "Hoy", cards: "Tarjetas", speak: "Hablar", words: "Palabras", progress: "Progreso", coach: "Maestro" },
+    blocks: { review: "Repaso", lesson: "Lección", break: "Descanso", input: "Escuchar", speak: "Hablar", new: "Palabras" },
+  },
+  ja: {
+    id: "ja", name: "Japanese", native: "日本語", lang: "ja-JP", script: "kana",
+    storeKey: "language-coach-ja-v1", runKey: "language-coach-ja-running",
+    stageNote: "stages 1 to 3 are the JLPT N5 core words",
+    readingLabel: "Reading in kana", readingHint: "がっこう",
+    lessonNote: "Weeks 1–2: learn hiragana with Tofugu's guide. Then NHK Easy Japanese, one lesson a session.",
+    inputNote: "Comprehensible Japanese videos first. Add NHK News Web Easy from month 3.",
+    tabs: { today: "今日", cards: "カード", script: "かな", speak: "話す", words: "言葉", progress: "進歩", coach: "先生" },
+    blocks: { review: "復習", kana: "かな", lesson: "授業", break: "休憩", input: "聞く・読む", speak: "話す", new: "新しい言葉" },
+  },
+};
+const COURSE_KEY = "language-coach-course";
+const CUR = (() => { try { const c = localStorage.getItem(COURSE_KEY); return COURSE_META[c] ? c : "zh"; } catch { return "zh"; } })();
+const COURSE = COURSE_META[CUR];
+document.documentElement.dataset.course = CUR;
+
 // Stage 1 — the classic HSK 1 words, ordered for study (greetings → numbers → family → time → verbs → places).
 // One word per line: hanzi|pinyin with one syllable per space|meaning
-window.MC_DATA = window.MC_DATA || { stages: {} };
-MC_DATA.stages[1] = `
+window.MC_COURSES = window.MC_COURSES || {};
+(MC_COURSES.zh ||= { stages: {} }).stages[1] = `
 你|nǐ|you
 好|hǎo|good; well
 我|wǒ|I; me
@@ -462,8 +538,7 @@ MC_DATA.stages[1] = `
 `;
 
 // Stage 2 — the classic HSK 2 words, ordered for study.
-window.MC_DATA = window.MC_DATA || { stages: {} };
-MC_DATA.stages[2] = `
+MC_COURSES.zh.stages[2] = `
 您|nín|you (polite)
 它|tā|it
 大家|dà jiā|everyone
@@ -618,8 +693,7 @@ MC_DATA.stages[2] = `
 `;
 
 // Stage 3 (part 1) — classic HSK 3 words, ordered for study.
-window.MC_DATA = window.MC_DATA || { stages: {} };
-MC_DATA.stages[3] = `
+MC_COURSES.zh.stages[3] = `
 爷爷|yé ye|grandpa (father's father)
 奶奶|nǎi nai|grandma (father's mother)
 叔叔|shū shu|uncle
@@ -757,7 +831,7 @@ MC_DATA.stages[3] = `
 `;
 
 // Stage 3 (part 2) — classic HSK 3 words, continued.
-MC_DATA.stages[3] += `
+MC_COURSES.zh.stages[3] += `
 关|guān|to close; to turn off
 发|fā|to send
 画|huà|to draw; painting
@@ -909,8 +983,7 @@ MC_DATA.stages[3] += `
 
 // Shadowing sentences and role-play scenarios.
 // Sentence: [stage, hanzi, pinyin (syllables split by spaces), English]
-window.MC_DATA = window.MC_DATA || { stages: {} };
-MC_DATA.sentences = [
+MC_COURSES.zh.sentences = [
   [1, "你好，我叫王明。", "Nǐ hǎo, wǒ jiào Wáng Míng.", "Hello, my name is Wang Ming."],
   [1, "你叫什么名字？", "Nǐ jiào shén me míng zi?", "What's your name?"],
   [1, "认识你很高兴。", "Rèn shi nǐ hěn gāo xìng.", "Nice to meet you."],
@@ -950,7 +1023,7 @@ MC_DATA.sentences = [
 ];
 
 // Role-play scenarios for the conversation partner.
-MC_DATA.scenarios = [
+MC_COURSES.zh.scenarios = [
   { id: "meet", stage: 1, title: "Meet someone new", zh: "认识新朋友",
     you: "a student meeting a new classmate", them: "a friendly exchange student from China, Lin Na (林娜)" },
   { id: "food", stage: 1, title: "Order food", zh: "点菜",
@@ -970,7 +1043,7 @@ MC_DATA.scenarios = [
 ];
 
 // Where each outside block of the session points.
-MC_DATA.links = {
+MC_COURSES.zh.links = {
   lesson: [
     { name: "HelloChinese", note: "Main course, months 1–3", url: "https://www.hellochinese.cc/" },
     { name: "Chinese Zero to Hero", note: "Free HSK courses on YouTube, from month 4", url: "https://www.youtube.com/results?search_query=Chinese+Zero+to+Hero+HSK+course" }
@@ -985,8 +1058,1157 @@ MC_DATA.links = {
   ]
 };
 
+// Spanish (Latin American) — everyday words in three stages, about level A1–A2. Nouns carry their article.
+// One word per line: spanish||english (the middle field is empty: Spanish is read the way it is written)
+window.MC_COURSES = window.MC_COURSES || {};
+(MC_COURSES.es ||= { stages: {} }).stages[1] = `
+hola||hello
+adiós||goodbye
+buenos días||good morning
+buenas tardes||good afternoon
+buenas noches||good evening; good night
+gracias||thank you
+de nada||you're welcome
+por favor||please
+perdón||excuse me; sorry
+lo siento||I'm sorry
+sí||yes
+no||no
+¿cómo estás?||how are you? (to a friend)
+bien||well; fine
+mal||badly; not well
+mucho gusto||nice to meet you
+me llamo…||my name is…
+¿cómo te llamas?||what's your name?
+yo||I
+tú||you (friend)
+usted||you (polite)
+él||he
+ella||she
+nosotros||we
+ustedes||you (plural)
+ellos||they
+ser||to be (who or what something is)
+estar||to be (where or how something is)
+tener||to have
+hay||there is; there are
+cero||zero
+uno||one
+dos||two
+tres||three
+cuatro||four
+cinco||five
+seis||six
+siete||seven
+ocho||eight
+nueve||nine
+diez||ten
+la familia||family
+el padre||father
+la madre||mother
+el papá||dad
+la mamá||mom
+el hermano||brother
+la hermana||sister
+el hijo||son
+la hija||daughter
+el amigo||friend (a man)
+la amiga||friend (a woman)
+el hombre||man
+la mujer||woman
+el niño||boy; child
+la niña||girl
+el señor||Mr.; sir
+la señora||Mrs.; ma'am
+el profesor||teacher (a man)
+la profesora||teacher (a woman)
+el estudiante||student
+hoy||today
+mañana||tomorrow
+ayer||yesterday
+ahora||now
+el día||day
+la semana||week
+el mes||month
+el año||year
+la hora||hour; time (o'clock)
+¿qué hora es?||what time is it?
+lunes||Monday
+martes||Tuesday
+miércoles||Wednesday
+jueves||Thursday
+viernes||Friday
+sábado||Saturday
+domingo||Sunday
+el agua||water
+el café||coffee
+el té||tea
+la leche||milk
+el pan||bread
+el arroz||rice
+la carne||meat
+el pollo||chicken
+el pescado||fish (as food)
+la fruta||fruit
+la manzana||apple
+el jugo||juice
+la comida||food; meal
+el desayuno||breakfast
+el almuerzo||lunch
+la cena||dinner
+la casa||house; home
+la escuela||school
+el trabajo||work; job
+la ciudad||city
+el país||country
+el hotel||hotel
+el restaurante||restaurant
+la tienda||store; shop
+el baño||bathroom
+la calle||street
+el carro||car
+el autobús||bus
+el dinero||money
+el teléfono||phone
+el libro||book
+la mesa||table
+la silla||chair
+la puerta||door
+comer||to eat
+beber||to drink
+hablar||to speak
+ir||to go
+venir||to come
+querer||to want; to love
+poder||can; to be able to
+hacer||to do; to make
+ver||to see
+mirar||to look at; to watch
+escuchar||to listen
+leer||to read
+escribir||to write
+vivir||to live
+trabajar||to work
+estudiar||to study
+comprar||to buy
+dormir||to sleep
+gustar||to be liked (me gusta = I like it)
+saber||to know (a fact)
+conocer||to know (a person or place)
+bueno||good
+malo||bad
+grande||big
+pequeño||small
+nuevo||new
+viejo||old
+caliente||hot (to the touch)
+frío||cold
+bonito||pretty
+feliz||happy
+cansado||tired
+muy||very
+también||also; too
+y||and
+o||or
+pero||but
+con||with
+sin||without
+en||in; on; at
+de||of; from
+a||to
+¿qué?||what?
+¿quién?||who?
+¿dónde?||where?
+¿cuándo?||when?
+¿cómo?||how?
+¿por qué?||why?
+¿cuánto?||how much?
+porque||because
+`;
+MC_COURSES.es.stages[2] = `
+once||eleven
+doce||twelve
+trece||thirteen
+catorce||fourteen
+quince||fifteen
+veinte||twenty
+treinta||thirty
+cuarenta||forty
+cincuenta||fifty
+cien||one hundred
+mil||one thousand
+primero||first
+segundo||second
+último||last
+la mañana||morning
+la tarde||afternoon; early evening
+la noche||night
+el fin de semana||weekend
+temprano||early
+tarde||late
+siempre||always
+nunca||never
+a veces||sometimes
+otra vez||again
+ya||already; now
+todavía||still; yet
+enero||January
+febrero||February
+marzo||March
+abril||April
+mayo||May
+junio||June
+julio||July
+agosto||August
+septiembre||September
+octubre||October
+noviembre||November
+diciembre||December
+el cumpleaños||birthday
+la fiesta||party
+el esposo||husband
+la esposa||wife
+el abuelo||grandfather
+la abuela||grandmother
+el tío||uncle
+la tía||aunt
+el bebé||baby
+la gente||people
+el perro||dog
+el gato||cat
+el cuerpo||body
+la cabeza||head
+los ojos||eyes
+la boca||mouth
+la mano||hand
+el pie||foot
+el médico||doctor
+el hospital||hospital
+la farmacia||pharmacy
+el mercado||market
+el supermercado||supermarket
+el banco||bank
+la iglesia||church
+el parque||park
+la playa||beach
+el aeropuerto||airport
+el avión||airplane
+el tren||train
+la estación||station
+el boleto||ticket
+el cuarto||room
+la cocina||kitchen
+la cama||bed
+la ventana||window
+la ropa||clothes
+la camisa||shirt
+los zapatos||shoes
+el color||color
+rojo||red
+azul||blue
+verde||green
+amarillo||yellow
+blanco||white
+negro||black
+el huevo||egg
+la papa||potato
+el queso||cheese
+la sopa||soup
+el azúcar||sugar
+la sal||salt
+la cerveza||beer
+el vino||wine
+el plato||plate; dish
+el vaso||glass (for drinking)
+la cuenta||the bill; account
+el precio||price
+barato||cheap
+caro||expensive
+abrir||to open
+cerrar||to close
+empezar||to start
+terminar||to finish
+llegar||to arrive
+salir||to leave; to go out
+entrar||to go in
+volver||to come back
+esperar||to wait; to hope
+buscar||to look for
+encontrar||to find
+dar||to give
+tomar||to take; to drink
+llevar||to carry; to wear
+pagar||to pay
+vender||to sell
+necesitar||to need
+ayudar||to help
+preguntar||to ask
+contestar||to answer
+entender||to understand
+pensar||to think
+creer||to believe
+decir||to say; to tell
+llamar||to call
+jugar||to play (a game or sport)
+cantar||to sing
+bailar||to dance
+caminar||to walk
+correr||to run
+nadar||to swim
+cocinar||to cook
+limpiar||to clean
+lavar||to wash
+viajar||to travel
+alto||tall
+bajo||short (height)
+largo||long
+corto||short (length)
+fácil||easy
+difícil||difficult
+rápido||fast
+lento||slow
+cerca||near
+lejos||far
+aquí||here
+allí||there
+este||this
+ese||that
+mucho||a lot; much
+poco||a little
+más||more
+menos||less
+todo||all; everything
+nada||nothing
+algo||something
+alguien||someone
+nadie||nobody
+`;
+MC_COURSES.es.stages[3] = `
+el tiempo||time; weather
+hace calor||it's hot (weather)
+hace frío||it's cold (weather)
+llover||to rain
+la lluvia||rain
+el sol||sun
+la luna||moon
+el cielo||sky
+el mar||sea
+el río||river
+la montaña||mountain
+el árbol||tree
+la flor||flower
+el animal||animal
+el pájaro||bird
+el mundo||world
+la vida||life
+el amor||love
+la salud||health
+enfermo||sick
+el dolor||pain
+la medicina||medicine
+la pregunta||question
+la respuesta||answer
+el problema||problem
+la idea||idea
+la palabra||word
+el idioma||language
+el español||Spanish (language)
+el inglés||English (language)
+la clase||class
+la tarea||homework
+el examen||exam
+la universidad||university
+la oficina||office
+la empresa||company
+el jefe||boss
+la reunión||meeting
+el correo||mail; email
+la computadora||computer
+el celular||cell phone
+la foto||photo
+la música||music
+la película||movie
+el juego||game
+el deporte||sport
+el fútbol||soccer
+la noticia||news
+la historia||history; story
+la cultura||culture
+el centro||center; downtown
+la esquina||street corner
+a la derecha||to the right
+a la izquierda||to the left
+derecho||straight ahead
+la dirección||address; direction
+el mapa||map
+el viaje||trip
+la maleta||suitcase
+el pasaporte||passport
+las vacaciones||vacation
+el regalo||gift
+la cita||appointment; date
+recordar||to remember
+olvidar||to forget
+aprender||to learn
+enseñar||to teach
+explicar||to explain
+practicar||to practise
+mejorar||to improve
+cambiar||to change
+usar||to use
+poner||to put
+traer||to bring
+mandar||to send
+recibir||to receive
+ganar||to win; to earn
+perder||to lose
+sentir||to feel
+parecer||to seem
+deber||must; should; to owe
+intentar||to try
+dejar||to leave (something); to let
+seguir||to follow; to keep going
+subir||to go up
+bajar||to go down
+manejar||to drive
+descansar||to rest
+despertarse||to wake up
+levantarse||to get up
+ducharse||to take a shower
+vestirse||to get dressed
+casarse||to get married
+preocuparse||to worry
+el miedo||fear
+la verdad||truth
+la mentira||lie
+importante||important
+interesante||interesting
+aburrido||bored; boring
+contento||glad
+triste||sad
+enojado||angry
+nervioso||nervous
+listo||ready; smart
+ocupado||busy
+libre||free (not busy)
+lleno||full
+vacío||empty
+limpio||clean
+sucio||dirty
+fuerte||strong
+débil||weak
+joven||young
+mayor||older
+mejor||better
+peor||worse
+igual||the same
+diferente||different
+posible||possible
+seguro||sure; safe
+otro||other; another
+cada||each; every
+mismo||same
+solo||alone; only
+juntos||together
+casi||almost
+bastante||quite; enough
+demasiado||too much
+pronto||soon
+luego||later; then
+después||after; afterwards
+antes||before
+durante||during
+mientras||while
+entonces||so; then
+si||if
+cuando||when
+aunque||although
+para||for; in order to
+por||for; by; through
+entre||between
+sobre||on; about
+debajo de||under
+encima de||on top of
+delante de||in front of
+detrás de||behind
+al lado de||next to
+dentro de||inside
+fuera de||outside
+`;
+
+// Spanish sentences for shadowing and the speaking drill: [stage, spanish, "", english]
+MC_COURSES.es.sentences = [
+  [1, "Hola, me llamo Ana.", "", "Hello, my name is Ana."],
+  [1, "¿Cómo te llamas?", "", "What's your name?"],
+  [1, "Mucho gusto.", "", "Nice to meet you."],
+  [1, "Soy de Filipinas.", "", "I'm from the Philippines."],
+  [1, "¿Cómo estás?", "", "How are you?"],
+  [1, "Estoy bien, gracias.", "", "I'm fine, thanks."],
+  [1, "¿Cuánto cuesta?", "", "How much is it?"],
+  [1, "Quiero un café, por favor.", "", "I'd like a coffee, please."],
+  [1, "No hablo mucho español.", "", "I don't speak much Spanish."],
+  [1, "¿Hablas inglés?", "", "Do you speak English?"],
+  [1, "¿Dónde está el baño?", "", "Where is the bathroom?"],
+  [1, "Tengo dos hermanos.", "", "I have two siblings."],
+  [1, "Hoy es lunes.", "", "Today is Monday."],
+  [1, "Me gusta la comida filipina.", "", "I like Filipino food."],
+  [1, "Vivo en una casa grande.", "", "I live in a big house."],
+  [2, "¿Puedes repetir, por favor?", "", "Can you repeat that, please?"],
+  [2, "No entiendo.", "", "I don't understand."],
+  [2, "Es muy caro.", "", "It's very expensive."],
+  [2, "¿A qué hora llega el autobús?", "", "What time does the bus arrive?"],
+  [2, "Necesito ayuda.", "", "I need help."],
+  [2, "Vamos a la playa el sábado.", "", "We're going to the beach on Saturday."],
+  [2, "Mi cumpleaños es en marzo.", "", "My birthday is in March."],
+  [2, "Siempre tomo café en la mañana.", "", "I always drink coffee in the morning."],
+  [2, "¿Me trae la cuenta, por favor?", "", "Could you bring me the bill, please?"],
+  [2, "El hospital está cerca de aquí.", "", "The hospital is near here."],
+  [3, "Hace mucho calor hoy.", "", "It's very hot today."],
+  [3, "Estoy aprendiendo español.", "", "I'm learning Spanish."],
+  [3, "¿Qué hiciste el fin de semana?", "", "What did you do on the weekend?"],
+  [3, "Si llueve, nos quedamos en casa.", "", "If it rains, we'll stay home."],
+  [3, "Gire a la derecha en la esquina.", "", "Turn right at the corner."],
+  [3, "Olvidé mi pasaporte.", "", "I forgot my passport."],
+  [3, "Es más fácil de lo que pensaba.", "", "It's easier than I thought."]
+];
+MC_COURSES.es.links = {
+  lesson: [
+    { name: "Language Transfer", note: "Free audio course: Complete Spanish", url: "https://www.languagetransfer.org/" },
+    { name: "SpanishDict", note: "Free grammar lessons and dictionary", url: "https://www.spanishdict.com/" }
+  ],
+  input: [
+    { name: "Dreaming Spanish", note: "Easy videos made for learners, many free", url: "https://www.dreamingspanish.com/" },
+    { name: "Easy Spanish", note: "Street interviews with subtitles (YouTube)", url: "https://www.youtube.com/results?search_query=Easy+Spanish+street+interviews" }
+  ],
+  tools: [
+    { name: "SpanishDict", note: "Free dictionary with audio", url: "https://www.spanishdict.com/" }
+  ]
+};
+
+// Japanese — the JLPT N5 core in three stages. One word per line: usual writing|reading in kana|english
+// Recordings are made from the kana, so the audio always matches the reading shown.
+window.MC_COURSES = window.MC_COURSES || {};
+(MC_COURSES.ja ||= { stages: {} }).stages[1] = `
+こんにちは|こんにちは|hello; good afternoon
+おはようございます|おはようございます|good morning (polite)
+こんばんは|こんばんは|good evening
+さようなら|さようなら|goodbye
+ありがとうございます|ありがとうございます|thank you (polite)
+どういたしまして|どういたしまして|you're welcome
+すみません|すみません|excuse me; sorry
+ごめんなさい|ごめんなさい|I'm sorry
+お願いします|おねがいします|please (when asking for something)
+はい|はい|yes
+いいえ|いいえ|no
+はじめまして|はじめまして|nice to meet you (first meeting)
+よろしくお願いします|よろしくおねがいします|please treat me well (said when meeting)
+いただきます|いただきます|said before eating
+ごちそうさまでした|ごちそうさまでした|said after eating (thanks for the meal)
+私|わたし|I; me
+あなた|あなた|you
+彼|かれ|he; boyfriend
+彼女|かのじょ|she; girlfriend
+これ|これ|this (thing)
+それ|それ|that (near you)
+あれ|あれ|that (over there)
+ここ|ここ|here
+そこ|そこ|there (near you)
+あそこ|あそこ|over there
+どこ|どこ|where
+何|なに|what
+誰|だれ|who
+いつ|いつ|when
+どう|どう|how
+いくら|いくら|how much (price)
+一|いち|one
+二|に|two
+三|さん|three
+四|よん|four
+五|ご|five
+六|ろく|six
+七|なな|seven
+八|はち|eight
+九|きゅう|nine
+十|じゅう|ten
+百|ひゃく|hundred
+千|せん|thousand
+万|まん|ten thousand
+円|えん|yen
+人|ひと|person
+友達|ともだち|friend
+家族|かぞく|family
+父|ちち|(my) father
+母|はは|(my) mother
+お父さん|おとうさん|father; dad
+お母さん|おかあさん|mother; mom
+兄|あに|(my) older brother
+姉|あね|(my) older sister
+弟|おとうと|younger brother
+妹|いもうと|younger sister
+子供|こども|child
+先生|せんせい|teacher
+学生|がくせい|student
+今日|きょう|today
+明日|あした|tomorrow
+昨日|きのう|yesterday
+今|いま|now
+朝|あさ|morning
+昼|ひる|noon; daytime
+夜|よる|night
+時間|じかん|time; hours
+毎日|まいにち|every day
+月曜日|げつようび|Monday
+火曜日|かようび|Tuesday
+水曜日|すいようび|Wednesday
+木曜日|もくようび|Thursday
+金曜日|きんようび|Friday
+土曜日|どようび|Saturday
+日曜日|にちようび|Sunday
+水|みず|water
+お茶|おちゃ|(green) tea
+コーヒー|コーヒー|coffee
+牛乳|ぎゅうにゅう|milk
+ご飯|ごはん|rice; meal
+パン|パン|bread
+肉|にく|meat
+魚|さかな|fish
+野菜|やさい|vegetables
+果物|くだもの|fruit
+卵|たまご|egg
+朝ご飯|あさごはん|breakfast
+昼ご飯|ひるごはん|lunch
+晩ご飯|ばんごはん|dinner
+家|いえ|house; home
+学校|がっこう|school
+会社|かいしゃ|company; office
+駅|えき|(train) station
+店|みせ|shop; store
+トイレ|トイレ|toilet; restroom
+病院|びょういん|hospital
+銀行|ぎんこう|bank
+レストラン|レストラン|restaurant
+車|くるま|car
+電車|でんしゃ|train
+バス|バス|bus
+お金|おかね|money
+電話|でんわ|telephone
+本|ほん|book
+机|つくえ|desk
+いす|いす|chair
+食べる|たべる|to eat
+飲む|のむ|to drink
+行く|いく|to go
+来る|くる|to come
+帰る|かえる|to go home; to return
+見る|みる|to see; to watch
+聞く|きく|to listen; to ask
+話す|はなす|to speak
+読む|よむ|to read
+書く|かく|to write
+買う|かう|to buy
+する|する|to do
+ある|ある|to be; to exist (things)
+いる|いる|to be; to exist (people, animals)
+分かる|わかる|to understand
+寝る|ねる|to sleep; to go to bed
+起きる|おきる|to wake up; to get up
+働く|はたらく|to work
+勉強する|べんきょうする|to study
+好き|すき|liked; to like
+嫌い|きらい|disliked; to dislike
+大きい|おおきい|big
+小さい|ちいさい|small
+いい|いい|good
+悪い|わるい|bad
+新しい|あたらしい|new
+古い|ふるい|old (things)
+高い|たかい|expensive; tall; high
+安い|やすい|cheap
+暑い|あつい|hot (weather)
+寒い|さむい|cold (weather)
+おいしい|おいしい|delicious
+楽しい|たのしい|fun; enjoyable
+元気|げんき|healthy; lively; fine
+とても|とても|very
+少し|すこし|a little
+たくさん|たくさん|a lot
+そして|そして|and; and then
+でも|でも|but
+`;
+MC_COURSES.ja.stages[2] = `
+時計|とけい|clock; watch
+今年|ことし|this year
+去年|きょねん|last year
+来年|らいねん|next year
+今週|こんしゅう|this week
+来週|らいしゅう|next week
+先週|せんしゅう|last week
+今月|こんげつ|this month
+誕生日|たんじょうび|birthday
+休み|やすみ|holiday; day off; break
+天気|てんき|weather
+雨|あめ|rain
+雪|ゆき|snow
+晴れ|はれ|sunny weather
+風|かぜ|wind
+空|そら|sky
+山|やま|mountain
+川|かわ|river
+海|うみ|sea
+花|はな|flower
+木|き|tree
+犬|いぬ|dog
+猫|ねこ|cat
+鳥|とり|bird
+体|からだ|body
+頭|あたま|head
+目|め|eye
+耳|みみ|ear
+口|くち|mouth
+手|て|hand
+足|あし|foot; leg
+病気|びょうき|illness; sick
+薬|くすり|medicine
+医者|いしゃ|doctor
+部屋|へや|room
+台所|だいどころ|kitchen
+窓|まど|window
+ドア|ドア|door
+ベッド|ベッド|bed
+服|ふく|clothes
+靴|くつ|shoes
+帽子|ぼうし|hat
+かばん|かばん|bag
+傘|かさ|umbrella
+色|いろ|color
+赤い|あかい|red
+青い|あおい|blue
+白い|しろい|white
+黒い|くろい|black
+黄色い|きいろい|yellow
+道|みち|road; way
+右|みぎ|right
+左|ひだり|left
+前|まえ|front; before
+後ろ|うしろ|behind
+上|うえ|up; on top
+下|した|down; under
+中|なか|inside; middle
+外|そと|outside
+隣|となり|next to; next door
+近く|ちかく|nearby
+遠い|とおい|far
+近い|ちかい|near
+空港|くうこう|airport
+飛行機|ひこうき|airplane
+切符|きっぷ|ticket
+地図|ちず|map
+公園|こうえん|park
+図書館|としょかん|library
+映画|えいが|movie
+音楽|おんがく|music
+写真|しゃしん|photo
+手紙|てがみ|letter
+名前|なまえ|name
+言葉|ことば|word; language
+日本語|にほんご|Japanese (language)
+英語|えいご|English (language)
+日本|にほん|Japan
+国|くに|country
+町|まち|town
+授業|じゅぎょう|class; lesson
+宿題|しゅくだい|homework
+試験|しけん|exam
+質問|しつもん|question
+仕事|しごと|work; job
+会う|あう|to meet
+待つ|まつ|to wait
+持つ|もつ|to hold; to have
+使う|つかう|to use
+作る|つくる|to make
+開ける|あける|to open
+閉める|しめる|to close
+入る|はいる|to enter
+出る|でる|to leave; to go out
+着る|きる|to wear (on the body)
+脱ぐ|ぬぐ|to take off (clothes)
+歩く|あるく|to walk
+走る|はしる|to run
+泳ぐ|およぐ|to swim
+遊ぶ|あそぶ|to play; to hang out
+歌う|うたう|to sing
+休む|やすむ|to rest; to take a day off
+始まる|はじまる|to begin
+終わる|おわる|to end
+教える|おしえる|to teach; to tell
+習う|ならう|to learn (from someone)
+知る|しる|to know
+思う|おもう|to think
+言う|いう|to say
+呼ぶ|よぶ|to call
+貸す|かす|to lend
+借りる|かりる|to borrow
+返す|かえす|to give back
+立つ|たつ|to stand
+座る|すわる|to sit
+洗う|あらう|to wash
+長い|ながい|long
+短い|みじかい|short
+重い|おもい|heavy
+軽い|かるい|light (in weight)
+早い|はやい|early
+速い|はやい|fast
+遅い|おそい|late; slow
+忙しい|いそがしい|busy
+易しい|やさしい|easy
+難しい|むずかしい|difficult
+広い|ひろい|wide; spacious
+狭い|せまい|narrow; cramped
+明るい|あかるい|bright
+暗い|くらい|dark
+静か|しずか|quiet
+有名|ゆうめい|famous
+大切|たいせつ|important; precious
+大丈夫|だいじょうぶ|okay; all right
+上手|じょうず|good at
+下手|へた|bad at
+いつも|いつも|always
+時々|ときどき|sometimes
+よく|よく|often; well
+まだ|まだ|still; not yet
+もう|もう|already
+一緒に|いっしょに|together
+一人で|ひとりで|alone; by yourself
+ゆっくり|ゆっくり|slowly
+すぐ|すぐ|right away
+`;
+MC_COURSES.ja.stages[3] = `
+自転車|じてんしゃ|bicycle
+タクシー|タクシー|taxi
+地下鉄|ちかてつ|subway
+建物|たてもの|building
+ホテル|ホテル|hotel
+大学|だいがく|university
+教室|きょうしつ|classroom
+新聞|しんぶん|newspaper
+雑誌|ざっし|magazine
+辞書|じしょ|dictionary
+鉛筆|えんぴつ|pencil
+紙|かみ|paper
+スマホ|スマホ|smartphone
+パソコン|パソコン|computer (PC)
+テレビ|テレビ|TV
+冷蔵庫|れいぞうこ|refrigerator
+お風呂|おふろ|bath
+シャワー|シャワー|shower
+料理|りょうり|cooking; dish
+お菓子|おかし|sweets; snacks
+お酒|おさけ|alcohol; sake
+ビール|ビール|beer
+お弁当|おべんとう|boxed lunch
+箸|はし|chopsticks
+皿|さら|plate
+コップ|コップ|cup; glass
+砂糖|さとう|sugar
+塩|しお|salt
+お腹|おなか|stomach; belly
+お腹がすく|おなかがすく|to get hungry
+喉が渇く|のどがかわく|to get thirsty
+痛い|いたい|painful; it hurts
+風邪|かぜ|a cold (illness)
+熱|ねつ|fever
+旅行|りょこう|trip; travel
+荷物|にもつ|luggage
+お土産|おみやげ|souvenir; gift from a trip
+プレゼント|プレゼント|present; gift
+約束|やくそく|promise; appointment
+意味|いみ|meaning
+問題|もんだい|problem; question (on a test)
+答え|こたえ|answer
+練習|れんしゅう|practice
+説明|せつめい|explanation
+話|はなし|talk; story
+声|こえ|voice
+歌|うた|song
+絵|え|picture; painting
+趣味|しゅみ|hobby
+スポーツ|スポーツ|sport
+サッカー|サッカー|soccer
+ゲーム|ゲーム|game
+世界|せかい|world
+文化|ぶんか|culture
+季節|きせつ|season
+春|はる|spring
+夏|なつ|summer
+秋|あき|autumn
+冬|ふゆ|winter
+暖かい|あたたかい|warm
+涼しい|すずしい|cool (weather)
+冷たい|つめたい|cold (to the touch)
+曇り|くもり|cloudy
+降る|ふる|to fall (rain, snow)
+晴れる|はれる|to clear up
+覚える|おぼえる|to memorize; to remember
+忘れる|わすれる|to forget
+答える|こたえる|to answer
+困る|こまる|to be stuck; to be in trouble
+疲れる|つかれる|to get tired
+住む|すむ|to live (somewhere)
+売る|うる|to sell
+払う|はらう|to pay
+送る|おくる|to send
+もらう|もらう|to receive
+あげる|あげる|to give
+くれる|くれる|to give (to me)
+乗る|のる|to ride; to get on
+降りる|おりる|to get off
+運転する|うんてんする|to drive
+掃除する|そうじする|to clean
+洗濯する|せんたくする|to do laundry
+料理する|りょうりする|to cook
+結婚する|けっこんする|to get married
+電話する|でんわする|to make a phone call
+練習する|れんしゅうする|to practise
+旅行する|りょこうする|to travel
+散歩する|さんぽする|to take a walk
+始める|はじめる|to start (something)
+続ける|つづける|to continue
+決める|きめる|to decide
+選ぶ|えらぶ|to choose
+探す|さがす|to look for
+見つける|みつける|to find
+手伝う|てつだう|to help
+頑張る|がんばる|to do your best
+可愛い|かわいい|cute
+きれい|きれい|pretty; clean
+嬉しい|うれしい|happy; glad
+悲しい|かなしい|sad
+怖い|こわい|scary; afraid
+面白い|おもしろい|interesting; funny
+つまらない|つまらない|boring
+優しい|やさしい|kind; gentle
+強い|つよい|strong
+弱い|よわい|weak
+若い|わかい|young
+多い|おおい|many; a lot
+少ない|すくない|few; little
+同じ|おなじ|same
+違う|ちがう|to be different; to be wrong
+便利|べんり|convenient
+簡単|かんたん|simple; easy
+親切|しんせつ|kind
+暇|ひま|free (time)
+本当|ほんとう|true; really
+全部|ぜんぶ|all; everything
+大体|だいたい|mostly; about
+多分|たぶん|probably; maybe
+きっと|きっと|surely
+ちょっと|ちょっと|a little; a moment
+また|また|again
+次|つぎ|next
+最初|さいしょ|first; the beginning
+最後|さいご|last; the end
+後で|あとで|later
+先に|さきに|first; ahead
+から|から|from; because
+まで|まで|until; up to
+だから|だから|so; that's why
+それから|それから|and then; after that
+`;
+
+// Japanese sentences: [stage, japanese, reading in kana, english, romaji]
+MC_COURSES.ja.sentences = [
+  [1, "はじめまして。", "はじめまして。", "Nice to meet you.", "Hajimemashite."],
+  [1, "私はマリアです。", "わたしは マリアです。", "I'm Maria.", "Watashi wa Maria desu."],
+  [1, "お名前は何ですか。", "おなまえは なんですか。", "What's your name?", "O-namae wa nan desu ka?"],
+  [1, "フィリピンから来ました。", "フィリピンから きました。", "I'm from the Philippines.", "Firipin kara kimashita."],
+  [1, "よろしくお願いします。", "よろしく おねがいします。", "Nice to meet you (please treat me well).", "Yoroshiku onegaishimasu."],
+  [1, "これは何ですか。", "これは なんですか。", "What is this?", "Kore wa nan desu ka?"],
+  [1, "いくらですか。", "いくらですか。", "How much is it?", "Ikura desu ka?"],
+  [1, "水をください。", "みずを ください。", "Water, please.", "Mizu o kudasai."],
+  [1, "トイレはどこですか。", "トイレは どこですか。", "Where is the restroom?", "Toire wa doko desu ka?"],
+  [1, "日本語が少し分かります。", "にほんごが すこし わかります。", "I understand a little Japanese.", "Nihongo ga sukoshi wakarimasu."],
+  [1, "今日は暑いですね。", "きょうは あついですね。", "It's hot today, isn't it?", "Kyou wa atsui desu ne."],
+  [1, "コーヒーが好きです。", "コーヒーが すきです。", "I like coffee.", "Koohii ga suki desu."],
+  [1, "毎日日本語を勉強します。", "まいにち にほんごを べんきょうします。", "I study Japanese every day.", "Mainichi nihongo o benkyou shimasu."],
+  [2, "もう一度お願いします。", "もう いちど おねがいします。", "One more time, please.", "Mou ichido onegaishimasu."],
+  [2, "分かりません。", "わかりません。", "I don't understand.", "Wakarimasen."],
+  [2, "駅はどこですか。", "えきは どこですか。", "Where is the station?", "Eki wa doko desu ka?"],
+  [2, "右に曲がってください。", "みぎに まがって ください。", "Please turn right.", "Migi ni magatte kudasai."],
+  [2, "週末は何をしますか。", "しゅうまつは なにを しますか。", "What do you do on weekends?", "Shuumatsu wa nani o shimasu ka?"],
+  [2, "一緒に行きましょう。", "いっしょに いきましょう。", "Let's go together.", "Issho ni ikimashou."],
+  [2, "雨が降っています。", "あめが ふっています。", "It's raining.", "Ame ga futte imasu."],
+  [2, "このかばんは高いです。", "この かばんは たかいです。", "This bag is expensive.", "Kono kaban wa takai desu."],
+  [2, "ちょっと待ってください。", "ちょっと まって ください。", "Please wait a moment.", "Chotto matte kudasai."],
+  [3, "日本へ旅行したいです。", "にほんへ りょこう したいです。", "I want to travel to Japan.", "Nihon e ryokou shitai desu."],
+  [3, "宿題を忘れました。", "しゅくだいを わすれました。", "I forgot my homework.", "Shukudai o wasuremashita."],
+  [3, "お腹がすきました。", "おなかが すきました。", "I'm hungry.", "Onaka ga sukimashita."],
+  [3, "頭が痛いです。", "あたまが いたいです。", "I have a headache.", "Atama ga itai desu."],
+  [3, "日本語は難しいですが、面白いです。", "にほんごは むずかしいですが、おもしろいです。", "Japanese is difficult, but interesting.", "Nihongo wa muzukashii desu ga, omoshiroi desu."],
+  [3, "明日は晴れるでしょう。", "あしたは はれるでしょう。", "It will probably be sunny tomorrow.", "Ashita wa hareru deshou."],
+  [3, "頑張ってください。", "がんばって ください。", "Do your best! (Good luck!)", "Ganbatte kudasai."]
+];
+// The basic kanji (JLPT N5): kanji|meaning|on readings (katakana)|kun readings (hiragana, okurigana in brackets)
+MC_COURSES.ja.kanji = `
+一|one|イチ、イツ|ひと(つ)
+二|two|ニ|ふた(つ)
+三|three|サン|みっ(つ)
+四|four|シ|よん、よっ(つ)
+五|five|ゴ|いつ(つ)
+六|six|ロク|むっ(つ)
+七|seven|シチ|なな(つ)
+八|eight|ハチ|やっ(つ)
+九|nine|キュウ、ク|ここの(つ)
+十|ten|ジュウ|とお
+百|hundred|ヒャク|
+千|thousand|セン|
+万|ten thousand|マン、バン|
+円|yen; circle|エン|まる(い)
+日|day; sun|ニチ、ジツ|ひ、か
+月|month; moon|ゲツ、ガツ|つき
+火|fire|カ|ひ
+水|water|スイ|みず
+木|tree|モク、ボク|き
+金|gold; money|キン、コン|かね
+土|earth; soil|ド、ト|つち
+年|year|ネン|とし
+時|time; hour|ジ|とき
+分|minute; part|フン、ブン|わ(かる)
+半|half|ハン|なか(ば)
+今|now|コン|いま
+何|what|カ|なに、なん
+週|week|シュウ|
+毎|every|マイ|
+午|noon|ゴ|
+前|before; front|ゼン|まえ
+後|after; behind|ゴ、コウ|うし(ろ)、あと
+人|person|ジン、ニン|ひと
+男|man|ダン、ナン|おとこ
+女|woman|ジョ、ニョ|おんな
+子|child|シ、ス|こ
+父|father|フ|ちち
+母|mother|ボ|はは
+友|friend|ユウ|とも
+先|ahead; previous|セン|さき
+生|life; birth|セイ、ショウ|い(きる)、う(まれる)
+学|study; learning|ガク|まな(ぶ)
+校|school|コウ|
+語|language; word|ゴ|かた(る)
+本|book; origin|ホン|もと
+名|name|メイ、ミョウ|な
+山|mountain|サン|やま
+川|river|セン|かわ
+天|heaven; sky|テン|あめ、あま
+気|spirit; air; mood|キ、ケ|
+雨|rain|ウ|あめ
+花|flower|カ|はな
+上|up; above|ジョウ|うえ、あ(がる)
+下|down; below|カ、ゲ|した、さ(がる)
+中|middle; inside|チュウ|なか
+外|outside|ガイ、ゲ|そと
+右|right|ウ、ユウ|みぎ
+左|left|サ|ひだり
+大|big|ダイ、タイ|おお(きい)
+小|small|ショウ|ちい(さい)、こ
+長|long; chief|チョウ|なが(い)
+高|tall; expensive|コウ|たか(い)
+安|cheap; calm|アン|やす(い)
+新|new|シン|あたら(しい)
+古|old|コ|ふる(い)
+白|white|ハク|しろ
+多|many|タ|おお(い)
+少|few; a little|ショウ|すく(ない)、すこ(し)
+国|country|コク|くに
+食|eat; food|ショク|た(べる)
+飲|drink|イン|の(む)
+見|see|ケン|み(る)
+聞|hear; ask|ブン、モン|き(く)
+読|read|ドク|よ(む)
+書|write|ショ|か(く)
+話|talk|ワ|はな(す)、はなし
+言|say|ゲン、ゴン|い(う)
+行|go|コウ、ギョウ|い(く)
+来|come|ライ|く(る)
+出|exit; go out|シュツ|で(る)、だ(す)
+入|enter|ニュウ|はい(る)、い(れる)
+休|rest|キュウ|やす(む)
+買|buy|バイ|か(う)
+立|stand|リツ|た(つ)
+会|meet|カイ|あ(う)
+電|electricity|デン|
+車|car; vehicle|シャ|くるま
+駅|station|エキ|
+店|shop|テン|みせ
+道|road; way|ドウ|みち
+東|east|トウ|ひがし
+西|west|セイ、サイ|にし
+南|south|ナン|みなみ
+北|north|ホク|きた
+口|mouth|コウ、ク|くち
+目|eye|モク|め
+耳|ear|ジ|みみ
+手|hand|シュ|て
+足|foot; leg|ソク|あし
+`;
+MC_COURSES.ja.links = {
+  lesson: [
+    { name: "NHK Easy Japanese", note: "Free beginner course with audio", url: "https://www3.nhk.or.jp/nhkworld/en/learnjapanese/" },
+    { name: "Tofugu: Learn Hiragana", note: "Free guide for weeks 1–2", url: "https://www.tofugu.com/japanese/learn-hiragana/" }
+  ],
+  input: [
+    { name: "Comprehensible Japanese", note: "Easy stories in Japanese (YouTube)", url: "https://www.youtube.com/results?search_query=Comprehensible+Japanese+complete+beginner" },
+    { name: "NHK News Web Easy", note: "Short news in easy Japanese, from month 3", url: "https://www3.nhk.or.jp/news/easy/" }
+  ],
+  tools: [
+    { name: "Jisho", note: "Free Japanese–English dictionary", url: "https://jisho.org/" },
+    { name: "Tofugu: Learn Katakana", note: "Free guide after hiragana", url: "https://www.tofugu.com/japanese/learn-katakana/" }
+  ]
+};
+// Every kana sound, as hiragana. Rows of the chart; "・" is an empty cell. Katakana is the same chart shifted in Unicode.
+MC_COURSES.ja.kana = {
+  basic: `
+あ い う え お
+か き く け こ
+さ し す せ そ
+た ち つ て と
+な に ぬ ね の
+は ひ ふ へ ほ
+ま み む め も
+や ・ ゆ ・ よ
+ら り る れ ろ
+わ ・ ・ ・ を
+ん ・ ・ ・ ・
+`,
+  dakuten: `
+が ぎ ぐ げ ご
+ざ じ ず ぜ ぞ
+だ ぢ づ で ど
+ば び ぶ べ ぼ
+ぱ ぴ ぷ ぺ ぽ
+`,
+  combo: `
+きゃ きゅ きょ
+しゃ しゅ しょ
+ちゃ ちゅ ちょ
+にゃ にゅ にょ
+ひゃ ひゅ ひょ
+みゃ みゅ みょ
+りゃ りゅ りょ
+ぎゃ ぎゅ ぎょ
+じゃ じゅ じょ
+びゃ びゅ びょ
+ぴゃ ぴゅ ぴょ
+`,
+};
+
 // Generated by tools/make_audio.py — recorded clips (Microsoft Xiaoxiao voice): key -> [file, start s, length s]
-window.MC_AUDIO = {"clips":{"你|nǐ":["s1",0.0,0.45],"好|hǎo":["s1",0.7,0.464],"我|wǒ":["s1",1.414,0.443],"是|shì":["s1",2.107,0.535],"不|bù":["s1",2.893,0.444],"谢谢|xièxie":["s1",3.587,0.721],"不客气|búkèqi":["s1",4.557,0.88],"对不起|duìbuqǐ":["s1",5.687,0.826],"没关系|méiguānxi":["s1",6.764,0.945],"再见|zàijiàn":["s1",7.959,0.688],"请|qǐng":["s1",8.897,0.532],"叫|jiào":["s1",9.68,0.494],"名字|míngzi":["s1",10.423,0.703],"什么|shénme":["s1",11.377,0.648],"他|tā":["s1",12.275,0.456],"她|tā":["s1",12.98,0.456],"我们|wǒmen":["s1",13.686,0.6],"的|de":["s1",14.535,0.629],"吗|ma":["s1",15.414,0.651],"呢|ne":["s1",16.315,0.664],"很|hěn":["s1",17.229,0.496],"认识|rènshi":["s1",17.975,0.731],"高兴|gāoxìng":["s1",18.956,0.722],"中国|Zhōngguó":["s1",19.928,0.734],"人|rén":["s1",20.913,0.473],"汉语|Hànyǔ":["s1",21.635,0.722],"老师|lǎoshī":["s1",22.607,0.739],"学生|xuésheng":["s1",23.596,0.751],"同学|tóngxué":["s1",24.598,0.764],"朋友|péngyou":["s1",25.612,0.678],"先生|xiānsheng":["s1",26.54,0.743],"小姐|xiǎojiě":["s1",27.533,0.745],"喂|wèi":["s1",28.528,0.493],"一|yī":["s1",29.271,0.447],"二|èr":["s1",29.969,0.495],"三|sān":["s1",30.714,0.547],"四|sì":["s1",31.51,0.557],"五|wǔ":["s1",32.317,0.484],"六|liù":["s1",33.051,0.485],"七|qī":["s1",33.786,0.53],"八|bā":["s1",34.566,0.488],"九|jiǔ":["s1",35.304,0.483],"十|shí":["s1",36.037,0.575],"几|jǐ":["s1",36.862,0.502],"多少|duōshao":["s1",37.614,0.691],"个|gè":["s1",38.554,0.486],"岁|suì":["s1",39.29,0.573],"块|kuài":["s1",40.113,0.497],"钱|qián":["s1",40.86,0.536],"本|běn":["s1",41.646,0.474],"些|xiē":["s1",42.37,0.539],"家|jiā":["s1",43.159,0.498],"爸爸|bàba":["s1",43.907,0.654],"妈妈|māma":["s1",44.811,0.67],"儿子|érzi":["s1",45.731,0.693],"女儿|nǚér":["s1",46.674,0.58],"医生|yīshēng":["s1",47.504,0.687],"现在|xiànzài":["s1",48.441,0.73],"今天|jīntiān":["s1",49.421,0.747],"明天|míngtiān":["s1",50.419,0.753],"昨天|zuótiān":["s1",51.422,0.727],"年|nián":["s1",52.399,0.489],"月|yuè":["s1",53.138,0.487],"号|hào":["s1",53.875,0.452],"星期|xīngqī":["s1",54.578,0.782],"点|diǎn":["s1",55.61,0.493],"分钟|fēnzhōng":["s1",56.353,0.685],"上午|shàngwǔ":["s1",57.288,0.749],"中午|zhōngwǔ":["s1",58.287,0.691],"下午|xiàwǔ":["s1",59.228,0.734],"时候|shíhou":["s1",60.212,0.734],"谁|shéi":["s1",61.197,0.535],"哪|nǎ":["s1",61.981,0.482],"哪儿|nǎr":["s1",62.714,0.444],"这|zhè":["s1",63.407,0.487],"那|nà":["s1",64.145,0.496],"这儿|zhèr":["s1",64.89,0.482],"那儿|nàr":["s1",65.623,0.49],"怎么|zěnme":["s1",66.363,0.596],"怎么样|zěnmeyàng":["s1",67.209,0.74],"有|yǒu":["s1",68.199,0.47],"没有|méiyǒu":["s1",68.919,0.692],"在|zài":["s1",69.861,0.48],"去|qù":["s1",70.591,0.524],"来|lái":["s1",71.365,0.475],"回|huí":["s1",72.09,0.466],"吃|chī":["s1",72.806,0.506],"喝|hē":["s1",73.562,0.488],"看|kàn":["s1",74.3,0.503],"看见|kànjiàn":["s1",75.053,0.679],"听|tīng":["s1",75.982,0.493],"说|shuō":["s1",76.725,0.536],"读|dú":["s1",77.511,0.481],"写|xiě":["s1",78.242,0.561],"做|zuò":["s1",79.053,0.497],"买|mǎi":["s1",79.801,0.476],"开|kāi":["s1",80.526,0.504],"坐|zuò":["s1",81.281,0.497],"住|zhù":["s1",82.028,0.47],"学习|xuéxí":["s1",82.748,0.807],"工作|gōngzuò":["s1",83.806,0.698],"睡觉|shuìjiào":["s1",84.754,0.773],"打电话|dǎdiànhuà":["s1",85.776,0.873],"喜欢|xǐhuan":["s1",86.899,0.754],"爱|ài":["s1",87.904,0.506],"想|xiǎng":["s1",88.659,0.567],"会|huì":["s1",89.477,0.503],"能|néng":["s1",90.229,0.464],"下雨|xiàyǔ":["s1",90.944,0.765],"学校|xuéxiào":["s1",91.959,0.762],"饭店|fàndiàn":["s1",92.971,0.687],"商店|shāngdiàn":["s1",93.908,0.773],"医院|yīyuàn":["s1",94.931,0.692],"火车站|huǒchēzhàn":["s1",95.873,0.879],"北京|Běijīng":["s1",97.002,0.691],"上|shàng":["s1",97.944,0.557],"下|xià":["s1",98.75,0.553],"前面|qiánmiàn":["s1",99.554,0.752],"后面|hòumiàn":["s1",100.556,0.676],"里|lǐ":["s1",101.482,0.468],"桌子|zhuōzi":["s1",102.2,0.67],"椅子|yǐzi":["s1",103.12,0.653],"电脑|diànnǎo":["s1",104.023,0.664],"电视|diànshì":["s1",104.936,0.741],"电影|diànyǐng":["s1",105.927,0.717],"飞机|fēijī":["s1",106.894,0.703],"出租车|chūzūchē":["s1",107.847,0.896],"东西|dōngxi":["s1",108.993,0.681],"衣服|yīfu":["s1",109.924,0.676],"书|shū":["s1",110.85,0.566],"字|zì":["s1",111.666,0.471],"杯子|bēizi":["s1",112.388,0.687],"菜|cài":["s1",113.325,0.527],"米饭|mǐfàn":["s1",114.102,0.719],"茶|chá":["s1",115.071,0.507],"水|shuǐ":["s1",115.828,0.567],"水果|shuǐguǒ":["s1",116.645,0.816],"苹果|píngguǒ":["s1",117.71,0.783],"猫|māo":["s1",118.744,0.453],"狗|gǒu":["s1",119.447,0.436],"天气|tiānqì":["s1",120.133,0.764],"冷|lěng":["s1",121.147,0.492],"热|rè":["s1",121.889,0.506],"大|dà":["s1",122.645,0.469],"小|xiǎo":["s1",123.364,0.531],"多|duō":["s1",124.145,0.436],"少|shǎo":["s1",124.831,0.566],"漂亮|piàoliang":["s1",125.647,0.705],"太|tài":["s1",126.602,0.507],"都|dōu":["s1",127.359,0.444],"和|hé":["s1",128.053,0.528],"了|le":["s1",128.83,0.627],"一点儿|yìdiǎnr":["s1",129.707,0.693],"您|nín":["s2",0.0,0.479],"它|tā":["s2",0.729,0.456],"大家|dàjiā":["s2",1.434,0.689],"姓|xìng":["s2",2.374,0.572],"介绍|jièshào":["s2",3.195,0.733],"哥哥|gēge":["s2",4.178,0.7],"姐姐|jiějie":["s2",5.128,0.681],"弟弟|dìdi":["s2",6.06,0.635],"妹妹|mèimei":["s2",6.945,0.696],"丈夫|zhàngfu":["s2",7.891,0.704],"妻子|qīzi":["s2",8.845,0.723],"孩子|háizi":["s2",9.818,0.721],"男|nán":["s2",10.789,0.472],"女|nǚ":["s2",11.511,0.48],"零|líng":["s2",12.241,0.486],"两|liǎng":["s2",12.977,0.476],"百|bǎi":["s2",13.703,0.493],"千|qiān":["s2",14.446,0.519],"第一|dìyī":["s2",15.216,0.646],"次|cì":["s2",16.112,0.515],"件|jiàn":["s2",16.877,0.509],"每|měi":["s2",17.637,0.481],"早上|zǎoshang":["s2",18.368,0.718],"晚上|wǎnshang":["s2",19.335,0.673],"小时|xiǎoshí":["s2",20.258,0.804],"时间|shíjiān":["s2",21.312,0.756],"日|rì":["s2",22.318,0.494],"去年|qùnián":["s2",23.062,0.755],"生日|shēngrì":["s2",24.067,0.725],"已经|yǐjīng":["s2",25.042,0.643],"正在|zhèngzài":["s2",25.935,0.674],"着|zhe":["s2",26.859,0.644],"过|guo":["s2",27.753,0.71],"就|jiù":["s2",28.712,0.492],"还|hái":["s2",29.455,0.45],"也|yě":["s2",30.154,0.456],"再|zài":["s2",30.86,0.48],"真|zhēn":["s2",31.59,0.454],"非常|fēicháng":["s2",32.295,0.718],"最|zuì":["s2",33.262,0.488],"别|bié":["s2",34.0,0.454],"吧|ba":["s2",34.703,0.666],"得|de":["s2",35.619,0.839],"为什么|wèishénme":["s2",36.708,0.759],"因为|yīnwèi":["s2",37.718,0.642],"所以|suǒyǐ":["s2",38.609,0.714],"但是|dànshì":["s2",39.574,0.735],"虽然|suīrán":["s2",40.559,0.764],"可以|kěyǐ":["s2",41.573,0.665],"可能|kěnéng":["s2",42.488,0.655],"要|yào":["s2",43.394,0.476],"觉得|juéde":["s2",44.12,0.67],"希望|xīwàng":["s2",45.039,0.73],"知道|zhīdào":["s2",46.019,0.655],"懂|dǒng":["s2",46.924,0.475],"告诉|gàosu":["s2",47.649,0.687],"问|wèn":["s2",48.586,0.465],"问题|wèntí":["s2",49.301,0.728],"回答|huídá":["s2",50.279,0.675],"说话|shuōhuà":["s2",51.204,0.748],"笑|xiào":["s2",52.202,0.549],"等|děng":["s2",53.001,0.459],"找|zhǎo":["s2",53.709,0.455],"给|gěi":["s2",54.414,0.483],"送|sòng":["s2",55.148,0.528],"帮助|bāngzhù":["s2",55.926,0.665],"让|ràng":["s2",56.842,0.478],"准备|zhǔnbèi":["s2",57.57,0.646],"开始|kāishǐ":["s2",58.465,0.787],"完|wán":["s2",59.502,0.465],"玩|wán":["s2",60.218,0.465],"到|dào":["s2",60.933,0.462],"从|cóng":["s2",61.645,0.529],"离|lí":["s2",62.424,0.433],"往|wǎng":["s2",63.107,0.454],"进|jìn":["s2",63.811,0.502],"出|chū":["s2",64.562,0.499],"走|zǒu":["s2",65.312,0.459],"跑步|pǎobù":["s2",66.021,0.675],"起床|qǐchuáng":["s2",66.946,0.734],"上班|shàngbān":["s2",67.93,0.742],"休息|xiūxi":["s2",68.922,0.745],"洗|xǐ":["s2",69.916,0.569],"穿|chuān":["s2",70.735,0.515],"卖|mài":["s2",71.5,0.466],"旅游|lǚyóu":["s2",72.217,0.635],"唱歌|chànggē":["s2",73.102,0.761],"跳舞|tiàowǔ":["s2",74.113,0.725],"游泳|yóuyǒng":["s2",75.088,0.718],"运动|yùndòng":["s2",76.056,0.658],"打篮球|dǎlánqiú":["s2",76.964,0.906],"踢足球|tīzúqiú":["s2",78.12,0.951],"生病|shēngbìng":["s2",79.321,0.775],"身体|shēntǐ":["s2",80.346,0.8],"药|yào":["s2",81.396,0.476],"眼睛|yǎnjing":["s2",82.122,0.723],"公司|gōngsī":["s2",83.095,0.718],"宾馆|bīnguǎn":["s2",84.063,0.741],"机场|jīchǎng":["s2",85.055,0.735],"教室|jiàoshì":["s2",86.04,0.742],"房间|fángjiān":["s2",87.032,0.672],"门|mén":["s2",87.953,0.462],"路|lù":["s2",88.665,0.447],"旁边|pángbiān":["s2",89.363,0.689],"左边|zuǒbian":["s2",90.302,0.697],"右边|yòubian":["s2",91.249,0.699],"外|wài":["s2",92.198,0.493],"公共汽车|gōnggòngqìchē":["s2",92.941,1.104],"手机|shǒujī":["s2",94.295,0.777],"手表|shǒubiǎo":["s2",95.322,0.806],"报纸|bàozhǐ":["s2",96.378,0.72],"铅笔|qiānbǐ":["s2",97.348,0.769],"票|piào":["s2",98.367,0.515],"课|kè":["s2",99.132,0.503],"考试|kǎoshì":["s2",99.885,0.744],"题|tí":["s2",100.878,0.511],"意思|yìsi":["s2",101.639,0.651],"事情|shìqing":["s2",102.541,0.743],"服务员|fúwùyuán":["s2",103.534,0.911],"咖啡|kāfēi":["s2",104.695,0.698],"牛奶|niúnǎi":["s2",105.643,0.739],"鸡蛋|jīdàn":["s2",106.632,0.685],"面条|miàntiáo":["s2",107.567,0.753],"羊肉|yángròu":["s2",108.57,0.729],"鱼|yú":["s2",109.548,0.425],"西瓜|xīguā":["s2",110.224,0.735],"好吃|hǎochī":["s2",111.209,0.731],"颜色|yánsè":["s2",112.19,0.739],"红|hóng":["s2",113.179,0.485],"白|bái":["s2",113.914,0.476],"黑|hēi":["s2",114.64,0.475],"晴|qíng":["s2",115.365,0.545],"阴|yīn":["s2",116.161,0.458],"雪|xuě":["s2",116.869,0.596],"新|xīn":["s2",117.714,0.544],"长|cháng":["s2",118.509,0.492],"高|gāo":["s2",119.251,0.466],"远|yuǎn":["s2",119.967,0.513],"近|jìn":["s2",120.731,0.502],"快|kuài":["s2",121.482,0.497],"慢|màn":["s2",122.229,0.481],"贵|guì":["s2",122.96,0.484],"便宜|piányi":["s2",123.694,0.674],"忙|máng":["s2",124.618,0.431],"累|lèi":["s2",125.299,0.492],"快乐|kuàilè":["s2",126.041,0.673],"错|cuò":["s2",126.964,0.54],"对|duì":["s2",127.754,0.454],"比|bǐ":["s2",128.458,0.455],"一起|yìqǐ":["s2",129.163,0.783],"一下|yíxià":["s2",130.197,0.65],"爷爷|yéye":["s3",0.0,0.692],"奶奶|nǎinai":["s3",0.942,0.687],"叔叔|shūshu":["s3",1.879,0.743],"阿姨|āyí":["s3",2.872,0.652],"邻居|línjū":["s3",3.774,0.706],"同事|tóngshì":["s3",4.73,0.717],"经理|jīnglǐ":["s3",5.697,0.716],"司机|sījī":["s3",6.663,0.734],"校长|xiàozhǎng":["s3",7.648,0.762],"客人|kèrén":["s3",8.66,0.702],"别人|biérén":["s3",9.612,0.661],"自己|zìjǐ":["s3",10.523,0.742],"年轻|niánqīng":["s3",11.514,0.732],"年级|niánjí":["s3",12.496,0.787],"班|bān":["s3",13.533,0.463],"国家|guójiā":["s3",14.246,0.674],"世界|shìjiè":["s3",15.17,0.752],"城市|chéngshì":["s3",16.171,0.762],"地方|dìfang":["s3",17.184,0.664],"附近|fùjìn":["s3",18.098,0.715],"中间|zhōngjiān":["s3",19.064,0.701],"东|dōng":["s3",20.015,0.456],"南|nán":["s3",20.721,0.472],"西|xī":["s3",21.443,0.535],"北方|běifāng":["s3",22.229,0.697],"街道|jiēdào":["s3",23.176,0.673],"楼|lóu":["s3",24.098,0.469],"层|céng":["s3",24.817,0.532],"电梯|diàntī":["s3",25.6,0.71],"办公室|bàngōngshì":["s3",26.56,0.91],"银行|yínháng":["s3",27.72,0.682],"超市|chāoshì":["s3",28.653,0.772],"公园|gōngyuán":["s3",29.675,0.7],"图书馆|túshūguǎn":["s3",30.625,0.957],"洗手间|xǐshǒujiān":["s3",31.832,0.979],"地铁|dìtiě":["s3",33.061,0.75],"自行车|zìxíngchē":["s3",34.061,0.947],"船|chuán":["s3",35.258,0.521],"辆|liàng":["s3",36.029,0.482],"地图|dìtú":["s3",36.761,0.726],"护照|hùzhào":["s3",37.736,0.698],"行李箱|xínglixiāng":["s3",38.684,0.928],"起飞|qǐfēi":["s3",39.863,0.731],"春|chūn":["s3",40.844,0.511],"夏|xià":["s3",41.606,0.553],"秋|qiū":["s3",42.409,0.528],"冬|dōng":["s3",43.187,0.456],"季节|jìjié":["s3",43.894,0.755],"周末|zhōumò":["s3",44.899,0.685],"节日|jiérì":["s3",45.834,0.735],"刻|kè":["s3",46.818,0.503],"半|bàn":["s3",47.571,0.476],"以前|yǐqián":["s3",48.297,0.719],"以后|yǐhòu":["s3",49.265,0.66],"过去|guòqù":["s3",50.176,0.68],"刚才|gāngcái":["s3",51.106,0.741],"最近|zuìjìn":["s3",52.098,0.689],"马上|mǎshàng":["s3",53.036,0.716],"一会儿|yíhuìr":["s3",54.002,0.654],"先|xiān":["s3",54.906,0.559],"然后|ránhòu":["s3",55.715,0.7],"最后|zuìhòu":["s3",56.664,0.694],"终于|zhōngyú":["s3",57.609,0.693],"突然|tūrán":["s3",58.551,0.697],"经常|jīngcháng":["s3",59.498,0.758],"总是|zǒngshì":["s3",60.507,0.766],"一直|yìzhí":["s3",61.523,0.723],"一定|yídìng":["s3",62.496,0.646],"一共|yígòng":["s3",63.391,0.651],"一样|yíyàng":["s3",64.293,0.633],"一般|yìbān":["s3",65.176,0.623],"一边|yìbiān":["s3",66.049,0.655],"几乎|jīhū":["s3",66.954,0.734],"其实|qíshí":["s3",67.938,0.789],"当然|dāngrán":["s3",68.977,0.702],"如果|rúguǒ":["s3",69.929,0.725],"或者|huòzhě":["s3",70.904,0.699],"还是|háishi":["s3",71.854,0.763],"除了|chúle":["s3",72.867,0.67],"关于|guānyú":["s3",73.787,0.677],"根据|gēnjù":["s3",74.714,0.664],"为了|wèile":["s3",75.628,0.616],"为|wèi":["s3",76.494,0.493],"向|xiàng":["s3",77.237,0.554],"跟|gēn":["s3",78.041,0.455],"把|bǎ":["s3",78.746,0.456],"被|bèi":["s3",79.452,0.49],"才|cái":["s3",80.192,0.524],"只|zhǐ":["s3",80.966,0.479],"又|yòu":["s3",81.695,0.511],"更|gèng":["s3",82.457,0.713],"越|yuè":["s3",83.42,0.487],"极|jí":["s3",84.157,0.498],"特别|tèbié":["s3",84.905,0.716],"比较|bǐjiào":["s3",85.871,0.689],"必须|bìxū":["s3",86.81,0.699],"应该|yīnggāi":["s3",87.759,0.714],"愿意|yuànyì":["s3",88.723,0.68],"敢|gǎn":["s3",89.652,0.467],"需要|xūyào":["s3",90.369,0.734],"打算|dǎsuàn":["s3",91.353,0.697],"决定|juédìng":["s3",92.3,0.701],"选择|xuǎnzé":["s3",93.251,0.762],"同意|tóngyì":["s3",94.263,0.711],"认为|rènwéi":["s3",95.224,0.705],"相信|xiāngxìn":["s3",96.179,0.784],"记得|jìde":["s3",97.213,0.667],"忘记|wàngjì":["s3",98.13,0.731],"明白|míngbai":["s3",99.111,0.694],"了解|liǎojiě":["s3",100.055,0.716],"发现|fāxiàn":["s3",101.02,0.683],"检查|jiǎnchá":["s3",101.953,0.741],"解决|jiějué":["s3",102.944,0.739],"完成|wánchéng":["s3",103.933,0.738],"提高|tígāo":["s3",104.921,0.7],"练习|liànxí":["s3",105.871,0.757],"复习|fùxí":["s3",106.878,0.796],"努力|nǔlì":["s3",107.924,0.687],"参加|cānjiā":["s3",108.86,0.723],"见面|jiànmiàn":["s3",109.833,0.718],"聊天|liáotiān":["s3",110.801,0.732],"讲|jiǎng":["s3",111.783,0.498],"教|jiāo":["s3",112.531,0.49],"表示|biǎoshì":["s3",113.272,0.726],"借|jiè":["s3",114.248,0.489],"还|huán":["s3",114.986,0.476],"换|huàn":["s3",115.713,0.472],"用|yòng":["s3",116.435,0.494],"试|shì":["s3",117.179,0.535],"拿|ná":["s3",117.964,0.49],"放|fàng":["s3",118.704,0.459],"带|dài":["s3",119.413,0.486],"接|jiē":["s3",120.149,0.486],"搬|bān":["s3",120.885,0.463],"关|guān":["s3",121.598,0.467],"发|fā":["s3",122.315,0.465],"画|huà":["s3",123.03,0.494],"骑|qí":["s3",123.774,0.532],"站|zhàn":["s3",124.557,0.497],"长|zhǎng":["s3",125.304,0.467],"像|xiàng":["s3",126.021,0.554],"离开|líkāi":["s3",126.826,0.733],"迟到|chídào":["s3",127.809,0.704],"请假|qǐngjià":["s3",128.763,0.714],"上网|shàngwǎng":["s3",129.727,0.748],"爬山|páshān":["s3",130.725,0.708],"锻炼|duànliàn":["s3",131.683,0.677],"打扫|dǎsǎo":["s3",132.61,0.715],"洗澡|xǐzǎo":["s3",133.576,0.772],"刷牙|shuāyá":["s3",134.598,0.781],"结婚|jiéhūn":["s3",135.629,0.716],"留学|liúxué":["s3",136.596,0.779],"照顾|zhàogu":["s3",137.625,0.684],"关心|guānxīn":["s3",138.559,0.68],"担心|dānxīn":["s3",139.489,0.68],"放心|fàngxīn":["s3",140.419,0.705],"害怕|hàipà":["s3",141.375,0.694],"生气|shēngqì":["s3",142.318,0.808],"着急|zháojí":["s3",143.376,0.731],"难过|nánguò":["s3",144.357,0.728],"满意|mǎnyì":["s3",145.335,0.694],"欢迎|huānyíng":["s3",146.279,0.702],"哭|kū":["s3",147.232,0.496],"疼|téng":["s3",147.977,0.488],"发烧|fāshāo":["s3",148.715,0.693],"感冒|gǎnmào":["s3",149.658,0.676],"健康|jiànkāng":["s3",150.584,0.717],"舒服|shūfu":["s3",151.551,0.797],"饿|è":["s3",152.598,0.495],"渴|kě":["s3",153.343,0.504],"饱|bǎo":["s3",154.097,0.417],"脸|liǎn":["s3",154.764,0.508],"鼻子|bízi":["s3",155.521,0.679],"耳朵|ěrduo":["s3",156.45,0.673],"嘴|zuǐ":["s3",157.373,0.504],"头发|tóufa":["s3",158.128,0.681],"脚|jiǎo":["s3",159.059,0.503],"腿|tuǐ":["s3",159.811,0.529],"矮|ǎi":["s3",160.591,0.51],"胖|pàng":["s3",161.351,0.494],"瘦|shòu":["s3",162.095,0.555],"可爱|kěài":["s3",162.9,0.663],"聪明|cōngming":["s3",163.813,0.718],"认真|rènzhēn":["s3",164.78,0.717],"热情|rèqíng":["s3",165.748,0.826],"安静|ānjìng":["s3",166.823,0.711],"干净|gānjìng":["s3",167.785,0.7],"简单|jiǎndān":["s3",168.735,0.685],"容易|róngyì":["s3",169.67,0.706],"难|nán":["s3",170.626,0.472],"方便|fāngbiàn":["s3",171.348,0.664],"奇怪|qíguài":["s3",172.262,0.764],"清楚|qīngchu":["s3",173.275,0.732],"重要|zhòngyào":["s3",174.258,0.665],"主要|zhǔyào":["s3",175.173,0.669],"有名|yǒumíng":["s3",176.092,0.692],"新鲜|xīnxiān":["s3",177.034,0.774],"甜|tián":["s3",178.057,0.523],"旧|jiù":["s3",178.83,0.492],"老|lǎo":["s3",179.572,0.452],"坏|huài":["s3",180.274,0.514],"短|duǎn":["s3",181.038,0.491],"低|dī":["s3",181.779,0.451],"久|jiǔ":["s3",182.48,0.483],"小心|xiǎoxīn":["s3",183.213,0.736],"蓝|lán":["s3",184.2,0.472],"绿|lǜ":["s3",184.922,0.458],"菜单|càidān":["s3",185.63,0.7],"面包|miànbāo":["s3",186.58,0.685],"蛋糕|dàngāo":["s3",187.515,0.673],"香蕉|xiāngjiāo":["s3",188.438,0.755],"果汁|guǒzhī":["s3",189.443,0.721],"饮料|yǐnliào":["s3",190.414,0.689],"啤酒|píjiǔ":["s3",191.353,0.735],"碗|wǎn":["s3",192.338,0.478],"盘子|pánzi":["s3",193.066,0.705],"筷子|kuàizi":["s3",194.02,0.707],"瓶子|píngzi":["s3",194.977,0.704],"冰箱|bīngxiāng":["s3",195.931,0.728],"空调|kōngtiáo":["s3",196.909,0.703],"灯|dēng":["s3",197.862,0.448],"伞|sǎn":["s3",198.56,0.573],"包|bāo":["s3",199.382,0.461],"帽子|màozi":["s3",200.093,0.684],"衬衫|chènshān":["s3",201.027,0.759],"裤子|kùzi":["s3",202.036,0.713],"裙子|qúnzi":["s3",202.999,0.719],"皮鞋|píxié":["s3",203.968,0.782],"双|shuāng":["s3",205.0,0.547],"条|tiáo":["s3",205.797,0.504],"张|zhāng":["s3",206.551,0.433],"位|wèi":["s3",207.234,0.493],"种|zhǒng":["s3",207.977,0.49],"段|duàn":["s3",208.717,0.473],"万|wàn":["s3",209.44,0.492],"元|yuán":["s3",210.183,0.466],"角|jiǎo":["s3",210.899,0.503],"公斤|gōngjīn":["s3",211.652,0.675],"米|mǐ":["s3",212.576,0.456],"照片|zhàopiàn":["s3",213.282,0.758],"照相机|zhàoxiàngjī":["s3",214.29,0.934],"电子邮件|diànzǐyóujiàn":["s3",215.474,1.055],"新闻|xīnwén":["s3",216.78,0.762],"节目|jiémù":["s3",217.792,0.708],"游戏|yóuxì":["s3",218.75,0.737],"音乐|yīnyuè":["s3",219.737,0.712],"故事|gùshi":["s3",220.7,0.701],"句子|jùzi":["s3",221.651,0.695],"词典|cídiǎn":["s3",222.596,0.77],"作业|zuòyè":["s3",223.616,0.722],"成绩|chéngjì":["s3",224.588,0.747],"水平|shuǐpíng":["s3",225.584,0.813],"数学|shùxué":["s3",226.647,0.832],"历史|lìshǐ":["s3",227.729,0.769],"文化|wénhuà":["s3",228.748,0.697],"中文|Zhōngwén":["s3",229.695,0.698],"体育|tǐyù":["s3",230.643,0.688],"比赛|bǐsài":["s3",231.581,0.684],"会议|huìyì":["s3",232.515,0.706],"机会|jīhuì":["s3",233.471,0.699],"办法|bànfǎ":["s3",234.42,0.686],"兴趣|xìngqù":["s3",235.356,0.768],"爱好|àihào":["s3",236.374,0.653],"习惯|xíguàn":["s3",237.276,0.768],"关系|guānxi":["s3",238.294,0.686],"环境|huánjìng":["s3",239.23,0.721],"变化|biànhuà":["s3",240.201,0.719],"礼物|lǐwù":["s3",241.171,0.665],"声音|shēngyīn":["s3",242.086,0.745],"太阳|tàiyáng":["s3",243.081,0.718],"月亮|yuèliang":["s3",244.049,0.675],"云|yún":["s3",244.974,0.464],"刮风|guāfēng":["s3",245.688,0.691],"树|shù":["s3",246.629,0.557],"花|huā":["s3",247.436,0.48],"草|cǎo":["s3",248.167,0.498],"河|hé":["s3",248.915,0.528],"动物|dòngwù":["s3",249.693,0.618],"鸟|niǎo":["s3",250.561,0.485],"马|mǎ":["s3",251.295,0.457],"熊猫|xióngmāo":["s3",252.002,0.732],"s:你好，我叫王明。":["sen",0.0,1.692],"ss:你好，我叫王明。":["sen",1.942,2.589],"s:你叫什么名字？":["sen",4.781,1.272],"ss:你叫什么名字？":["sen",6.304,1.921],"s:认识你很高兴。":["sen",8.475,1.377],"ss:认识你很高兴。":["sen",10.101,2.082],"s:你是哪国人？":["sen",12.433,1.202],"ss:你是哪国人？":["sen",13.885,1.81],"s:我是菲律宾人。":["sen",15.945,1.385],"ss:我是菲律宾人。":["sen",17.58,2.095],"s:这个多少钱？":["sen",19.925,1.209],"ss:这个多少钱？":["sen",21.384,1.821],"s:我想喝茶。":["sen",23.455,1.077],"ss:我想喝茶。":["sen",24.782,1.606],"s:我不会说汉语。":["sen",26.639,1.313],"ss:我不会说汉语。":["sen",28.202,1.969],"s:你会说英语吗？":["sen",30.42,1.314],"ss:你会说英语吗？":["sen",31.985,1.978],"s:今天天气很好。":["sen",34.212,1.461],"ss:今天天气很好。":["sen",35.923,2.221],"s:现在几点？":["sen",38.394,1.089],"ss:现在几点？":["sen",39.732,1.625],"s:我明天去北京。":["sen",41.607,1.351],"ss:我明天去北京。":["sen",43.208,2.044],"s:你家有几个人？":["sen",45.502,1.293],"ss:你家有几个人？":["sen",47.044,1.954],"s:我喜欢看电影。":["sen",49.249,1.392],"ss:我喜欢看电影。":["sen",50.891,2.105],"s:他是我的朋友。":["sen",53.246,1.223],"ss:他是我的朋友。":["sen",54.719,1.849],"s:你在哪儿工作？":["sen",56.818,1.18],"ss:你在哪儿工作？":["sen",58.248,1.784],"s:我在学校学习汉语。":["sen",60.283,1.75],"ss:我在学校学习汉语。":["sen",62.282,2.673],"s:太贵了！":["sen",65.206,0.827],"ss:太贵了！":["sen",66.283,1.195],"s:便宜一点儿吧。":["sen",67.728,1.073],"ss:便宜一点儿吧。":["sen",69.051,1.595],"s:请再说一次。":["sen",70.896,1.192],"ss:请再说一次。":["sen",72.338,1.798],"s:我听不懂。":["sen",74.386,0.967],"ss:我听不懂。":["sen",75.603,1.426],"s:你吃饭了吗？":["sen",77.279,1.07],"ss:你吃饭了吗？":["sen",78.599,1.601],"s:我已经吃了。":["sen",80.45,1.059],"ss:我已经吃了。":["sen",81.759,1.572],"s:我们一起去吧！":["sen",83.58,1.167],"ss:我们一起去吧！":["sen",84.997,1.753],"s:你觉得怎么样？":["sen",87.0,1.155],"ss:你觉得怎么样？":["sen",88.405,1.728],"s:机场离这儿远吗？":["sen",90.383,1.348],"ss:机场离这儿远吗？":["sen",91.981,2.033],"s:我每天早上跑步。":["sen",94.264,1.536],"ss:我每天早上跑步。":["sen",96.05,2.339],"s:因为下雨，所以我没去。":["sen",98.639,2.17],"ss:因为下雨，所以我没去。":["sen",101.059,3.335],"s:洗手间在哪儿？":["sen",104.644,1.247],"ss:洗手间在哪儿？":["sen",106.142,1.868],"s:你最近怎么样？":["sen",108.26,1.168],"ss:你最近怎么样？":["sen",109.677,1.747],"s:请帮我拿一下。":["sen",111.674,1.183],"ss:请帮我拿一下。":["sen",113.108,1.782],"s:别担心，我马上就到。":["sen",115.14,2.052],"ss:别担心，我马上就到。":["sen",117.442,3.159],"s:我的汉语水平提高了。":["sen",120.851,1.784],"ss:我的汉语水平提高了。":["sen",122.885,2.735],"s:如果明天不下雨，我们就去爬山。":["sen",125.87,2.767],"ss:如果明天不下雨，我们就去爬山。":["sen",128.888,4.273],"s:这家饭店的菜又便宜又好吃。":["sen",133.411,2.732],"ss:这家饭店的菜又便宜又好吃。":["sen",136.393,4.246],"s:我对中国文化很感兴趣。":["sen",140.89,2.128],"ss:我对中国文化很感兴趣。":["sen",143.267,3.269]},"carrier":{"的|de":["我的","wǒ de"],"吗|ma":["好吗","hǎo ma"],"呢|ne":["你呢","nǐ ne"],"了|le":["好了","hǎo le"],"吧|ba":["走吧","zǒu ba"],"着|zhe":["看着","kàn zhe"],"过|guo":["去过","qù guo"],"得|de":["跑得快","pǎo de kuài"],"更|gèng":["更好","gèng hǎo"]}};
+(window.MC_AUDIO_BY ||= {}).zh = {"clips":{"你|nǐ":["s1",0.0,0.45],"好|hǎo":["s1",0.7,0.464],"我|wǒ":["s1",1.414,0.443],"是|shì":["s1",2.107,0.535],"不|bù":["s1",2.893,0.444],"谢谢|xièxie":["s1",3.587,0.721],"不客气|búkèqi":["s1",4.557,0.88],"对不起|duìbuqǐ":["s1",5.687,0.826],"没关系|méiguānxi":["s1",6.764,0.945],"再见|zàijiàn":["s1",7.959,0.688],"请|qǐng":["s1",8.897,0.532],"叫|jiào":["s1",9.68,0.494],"名字|míngzi":["s1",10.423,0.703],"什么|shénme":["s1",11.377,0.648],"他|tā":["s1",12.275,0.456],"她|tā":["s1",12.98,0.456],"我们|wǒmen":["s1",13.686,0.6],"的|de":["s1",14.535,0.629],"吗|ma":["s1",15.414,0.651],"呢|ne":["s1",16.315,0.664],"很|hěn":["s1",17.229,0.496],"认识|rènshi":["s1",17.975,0.731],"高兴|gāoxìng":["s1",18.956,0.722],"中国|Zhōngguó":["s1",19.928,0.734],"人|rén":["s1",20.913,0.473],"汉语|Hànyǔ":["s1",21.635,0.722],"老师|lǎoshī":["s1",22.607,0.739],"学生|xuésheng":["s1",23.596,0.751],"同学|tóngxué":["s1",24.598,0.764],"朋友|péngyou":["s1",25.612,0.678],"先生|xiānsheng":["s1",26.54,0.743],"小姐|xiǎojiě":["s1",27.533,0.745],"喂|wèi":["s1",28.528,0.493],"一|yī":["s1",29.271,0.447],"二|èr":["s1",29.969,0.495],"三|sān":["s1",30.714,0.547],"四|sì":["s1",31.51,0.557],"五|wǔ":["s1",32.317,0.484],"六|liù":["s1",33.051,0.485],"七|qī":["s1",33.786,0.53],"八|bā":["s1",34.566,0.488],"九|jiǔ":["s1",35.304,0.483],"十|shí":["s1",36.037,0.575],"几|jǐ":["s1",36.862,0.502],"多少|duōshao":["s1",37.614,0.691],"个|gè":["s1",38.554,0.486],"岁|suì":["s1",39.29,0.573],"块|kuài":["s1",40.113,0.497],"钱|qián":["s1",40.86,0.536],"本|běn":["s1",41.646,0.474],"些|xiē":["s1",42.37,0.539],"家|jiā":["s1",43.159,0.498],"爸爸|bàba":["s1",43.907,0.654],"妈妈|māma":["s1",44.811,0.67],"儿子|érzi":["s1",45.731,0.693],"女儿|nǚér":["s1",46.674,0.58],"医生|yīshēng":["s1",47.504,0.687],"现在|xiànzài":["s1",48.441,0.73],"今天|jīntiān":["s1",49.421,0.747],"明天|míngtiān":["s1",50.419,0.753],"昨天|zuótiān":["s1",51.422,0.727],"年|nián":["s1",52.399,0.489],"月|yuè":["s1",53.138,0.487],"号|hào":["s1",53.875,0.452],"星期|xīngqī":["s1",54.578,0.782],"点|diǎn":["s1",55.61,0.493],"分钟|fēnzhōng":["s1",56.353,0.685],"上午|shàngwǔ":["s1",57.288,0.749],"中午|zhōngwǔ":["s1",58.287,0.691],"下午|xiàwǔ":["s1",59.228,0.734],"时候|shíhou":["s1",60.212,0.734],"谁|shéi":["s1",61.197,0.535],"哪|nǎ":["s1",61.981,0.482],"哪儿|nǎr":["s1",62.714,0.444],"这|zhè":["s1",63.407,0.487],"那|nà":["s1",64.145,0.496],"这儿|zhèr":["s1",64.89,0.482],"那儿|nàr":["s1",65.623,0.49],"怎么|zěnme":["s1",66.363,0.596],"怎么样|zěnmeyàng":["s1",67.209,0.74],"有|yǒu":["s1",68.199,0.47],"没有|méiyǒu":["s1",68.919,0.692],"在|zài":["s1",69.861,0.48],"去|qù":["s1",70.591,0.524],"来|lái":["s1",71.365,0.475],"回|huí":["s1",72.09,0.466],"吃|chī":["s1",72.806,0.506],"喝|hē":["s1",73.562,0.488],"看|kàn":["s1",74.3,0.503],"看见|kànjiàn":["s1",75.053,0.679],"听|tīng":["s1",75.982,0.493],"说|shuō":["s1",76.725,0.536],"读|dú":["s1",77.511,0.481],"写|xiě":["s1",78.242,0.561],"做|zuò":["s1",79.053,0.497],"买|mǎi":["s1",79.801,0.476],"开|kāi":["s1",80.526,0.504],"坐|zuò":["s1",81.281,0.497],"住|zhù":["s1",82.028,0.47],"学习|xuéxí":["s1",82.748,0.807],"工作|gōngzuò":["s1",83.806,0.698],"睡觉|shuìjiào":["s1",84.754,0.773],"打电话|dǎdiànhuà":["s1",85.776,0.873],"喜欢|xǐhuan":["s1",86.899,0.754],"爱|ài":["s1",87.904,0.506],"想|xiǎng":["s1",88.659,0.567],"会|huì":["s1",89.477,0.503],"能|néng":["s1",90.229,0.464],"下雨|xiàyǔ":["s1",90.944,0.765],"学校|xuéxiào":["s1",91.959,0.762],"饭店|fàndiàn":["s1",92.971,0.687],"商店|shāngdiàn":["s1",93.908,0.773],"医院|yīyuàn":["s1",94.931,0.692],"火车站|huǒchēzhàn":["s1",95.873,0.879],"北京|Běijīng":["s1",97.002,0.691],"上|shàng":["s1",97.944,0.557],"下|xià":["s1",98.75,0.553],"前面|qiánmiàn":["s1",99.554,0.752],"后面|hòumiàn":["s1",100.556,0.676],"里|lǐ":["s1",101.482,0.468],"桌子|zhuōzi":["s1",102.2,0.67],"椅子|yǐzi":["s1",103.12,0.653],"电脑|diànnǎo":["s1",104.023,0.664],"电视|diànshì":["s1",104.936,0.741],"电影|diànyǐng":["s1",105.927,0.717],"飞机|fēijī":["s1",106.894,0.703],"出租车|chūzūchē":["s1",107.847,0.896],"东西|dōngxi":["s1",108.993,0.681],"衣服|yīfu":["s1",109.924,0.676],"书|shū":["s1",110.85,0.566],"字|zì":["s1",111.666,0.471],"杯子|bēizi":["s1",112.388,0.687],"菜|cài":["s1",113.325,0.527],"米饭|mǐfàn":["s1",114.102,0.719],"茶|chá":["s1",115.071,0.507],"水|shuǐ":["s1",115.828,0.567],"水果|shuǐguǒ":["s1",116.645,0.816],"苹果|píngguǒ":["s1",117.71,0.783],"猫|māo":["s1",118.744,0.453],"狗|gǒu":["s1",119.447,0.436],"天气|tiānqì":["s1",120.133,0.764],"冷|lěng":["s1",121.147,0.492],"热|rè":["s1",121.889,0.506],"大|dà":["s1",122.645,0.469],"小|xiǎo":["s1",123.364,0.531],"多|duō":["s1",124.145,0.436],"少|shǎo":["s1",124.831,0.566],"漂亮|piàoliang":["s1",125.647,0.705],"太|tài":["s1",126.602,0.507],"都|dōu":["s1",127.359,0.444],"和|hé":["s1",128.053,0.528],"了|le":["s1",128.83,0.627],"一点儿|yìdiǎnr":["s1",129.707,0.693],"您|nín":["s2",0.0,0.479],"它|tā":["s2",0.729,0.456],"大家|dàjiā":["s2",1.434,0.689],"姓|xìng":["s2",2.374,0.572],"介绍|jièshào":["s2",3.195,0.733],"哥哥|gēge":["s2",4.178,0.7],"姐姐|jiějie":["s2",5.128,0.681],"弟弟|dìdi":["s2",6.06,0.635],"妹妹|mèimei":["s2",6.945,0.696],"丈夫|zhàngfu":["s2",7.891,0.704],"妻子|qīzi":["s2",8.845,0.723],"孩子|háizi":["s2",9.818,0.721],"男|nán":["s2",10.789,0.472],"女|nǚ":["s2",11.511,0.48],"零|líng":["s2",12.241,0.486],"两|liǎng":["s2",12.977,0.476],"百|bǎi":["s2",13.703,0.493],"千|qiān":["s2",14.446,0.519],"第一|dìyī":["s2",15.216,0.646],"次|cì":["s2",16.112,0.515],"件|jiàn":["s2",16.877,0.509],"每|měi":["s2",17.637,0.481],"早上|zǎoshang":["s2",18.368,0.718],"晚上|wǎnshang":["s2",19.335,0.673],"小时|xiǎoshí":["s2",20.258,0.804],"时间|shíjiān":["s2",21.312,0.756],"日|rì":["s2",22.318,0.494],"去年|qùnián":["s2",23.062,0.755],"生日|shēngrì":["s2",24.067,0.725],"已经|yǐjīng":["s2",25.042,0.643],"正在|zhèngzài":["s2",25.935,0.674],"着|zhe":["s2",26.859,0.644],"过|guo":["s2",27.753,0.71],"就|jiù":["s2",28.712,0.492],"还|hái":["s2",29.455,0.45],"也|yě":["s2",30.154,0.456],"再|zài":["s2",30.86,0.48],"真|zhēn":["s2",31.59,0.454],"非常|fēicháng":["s2",32.295,0.718],"最|zuì":["s2",33.262,0.488],"别|bié":["s2",34.0,0.454],"吧|ba":["s2",34.703,0.666],"得|de":["s2",35.619,0.839],"为什么|wèishénme":["s2",36.708,0.759],"因为|yīnwèi":["s2",37.718,0.642],"所以|suǒyǐ":["s2",38.609,0.714],"但是|dànshì":["s2",39.574,0.735],"虽然|suīrán":["s2",40.559,0.764],"可以|kěyǐ":["s2",41.573,0.665],"可能|kěnéng":["s2",42.488,0.655],"要|yào":["s2",43.394,0.476],"觉得|juéde":["s2",44.12,0.67],"希望|xīwàng":["s2",45.039,0.73],"知道|zhīdào":["s2",46.019,0.655],"懂|dǒng":["s2",46.924,0.475],"告诉|gàosu":["s2",47.649,0.687],"问|wèn":["s2",48.586,0.465],"问题|wèntí":["s2",49.301,0.728],"回答|huídá":["s2",50.279,0.675],"说话|shuōhuà":["s2",51.204,0.748],"笑|xiào":["s2",52.202,0.549],"等|děng":["s2",53.001,0.459],"找|zhǎo":["s2",53.709,0.455],"给|gěi":["s2",54.414,0.483],"送|sòng":["s2",55.148,0.528],"帮助|bāngzhù":["s2",55.926,0.665],"让|ràng":["s2",56.842,0.478],"准备|zhǔnbèi":["s2",57.57,0.646],"开始|kāishǐ":["s2",58.465,0.787],"完|wán":["s2",59.502,0.465],"玩|wán":["s2",60.218,0.465],"到|dào":["s2",60.933,0.462],"从|cóng":["s2",61.645,0.529],"离|lí":["s2",62.424,0.433],"往|wǎng":["s2",63.107,0.454],"进|jìn":["s2",63.811,0.502],"出|chū":["s2",64.562,0.499],"走|zǒu":["s2",65.312,0.459],"跑步|pǎobù":["s2",66.021,0.675],"起床|qǐchuáng":["s2",66.946,0.734],"上班|shàngbān":["s2",67.93,0.742],"休息|xiūxi":["s2",68.922,0.745],"洗|xǐ":["s2",69.916,0.569],"穿|chuān":["s2",70.735,0.515],"卖|mài":["s2",71.5,0.466],"旅游|lǚyóu":["s2",72.217,0.635],"唱歌|chànggē":["s2",73.102,0.761],"跳舞|tiàowǔ":["s2",74.113,0.725],"游泳|yóuyǒng":["s2",75.088,0.718],"运动|yùndòng":["s2",76.056,0.658],"打篮球|dǎlánqiú":["s2",76.964,0.906],"踢足球|tīzúqiú":["s2",78.12,0.951],"生病|shēngbìng":["s2",79.321,0.775],"身体|shēntǐ":["s2",80.346,0.8],"药|yào":["s2",81.396,0.476],"眼睛|yǎnjing":["s2",82.122,0.723],"公司|gōngsī":["s2",83.095,0.718],"宾馆|bīnguǎn":["s2",84.063,0.741],"机场|jīchǎng":["s2",85.055,0.735],"教室|jiàoshì":["s2",86.04,0.742],"房间|fángjiān":["s2",87.032,0.672],"门|mén":["s2",87.953,0.462],"路|lù":["s2",88.665,0.447],"旁边|pángbiān":["s2",89.363,0.689],"左边|zuǒbian":["s2",90.302,0.697],"右边|yòubian":["s2",91.249,0.699],"外|wài":["s2",92.198,0.493],"公共汽车|gōnggòngqìchē":["s2",92.941,1.104],"手机|shǒujī":["s2",94.295,0.777],"手表|shǒubiǎo":["s2",95.322,0.806],"报纸|bàozhǐ":["s2",96.378,0.72],"铅笔|qiānbǐ":["s2",97.348,0.769],"票|piào":["s2",98.367,0.515],"课|kè":["s2",99.132,0.503],"考试|kǎoshì":["s2",99.885,0.744],"题|tí":["s2",100.878,0.511],"意思|yìsi":["s2",101.639,0.651],"事情|shìqing":["s2",102.541,0.743],"服务员|fúwùyuán":["s2",103.534,0.911],"咖啡|kāfēi":["s2",104.695,0.698],"牛奶|niúnǎi":["s2",105.643,0.739],"鸡蛋|jīdàn":["s2",106.632,0.685],"面条|miàntiáo":["s2",107.567,0.753],"羊肉|yángròu":["s2",108.57,0.729],"鱼|yú":["s2",109.548,0.425],"西瓜|xīguā":["s2",110.224,0.735],"好吃|hǎochī":["s2",111.209,0.731],"颜色|yánsè":["s2",112.19,0.739],"红|hóng":["s2",113.179,0.485],"白|bái":["s2",113.914,0.476],"黑|hēi":["s2",114.64,0.475],"晴|qíng":["s2",115.365,0.545],"阴|yīn":["s2",116.161,0.458],"雪|xuě":["s2",116.869,0.596],"新|xīn":["s2",117.714,0.544],"长|cháng":["s2",118.509,0.492],"高|gāo":["s2",119.251,0.466],"远|yuǎn":["s2",119.967,0.513],"近|jìn":["s2",120.731,0.502],"快|kuài":["s2",121.482,0.497],"慢|màn":["s2",122.229,0.481],"贵|guì":["s2",122.96,0.484],"便宜|piányi":["s2",123.694,0.674],"忙|máng":["s2",124.618,0.431],"累|lèi":["s2",125.299,0.492],"快乐|kuàilè":["s2",126.041,0.673],"错|cuò":["s2",126.964,0.54],"对|duì":["s2",127.754,0.454],"比|bǐ":["s2",128.458,0.455],"一起|yìqǐ":["s2",129.163,0.783],"一下|yíxià":["s2",130.197,0.65],"爷爷|yéye":["s3",0.0,0.692],"奶奶|nǎinai":["s3",0.942,0.687],"叔叔|shūshu":["s3",1.879,0.743],"阿姨|āyí":["s3",2.872,0.652],"邻居|línjū":["s3",3.774,0.706],"同事|tóngshì":["s3",4.73,0.717],"经理|jīnglǐ":["s3",5.697,0.716],"司机|sījī":["s3",6.663,0.734],"校长|xiàozhǎng":["s3",7.648,0.762],"客人|kèrén":["s3",8.66,0.702],"别人|biérén":["s3",9.612,0.661],"自己|zìjǐ":["s3",10.523,0.742],"年轻|niánqīng":["s3",11.514,0.732],"年级|niánjí":["s3",12.496,0.787],"班|bān":["s3",13.533,0.463],"国家|guójiā":["s3",14.246,0.674],"世界|shìjiè":["s3",15.17,0.752],"城市|chéngshì":["s3",16.171,0.762],"地方|dìfang":["s3",17.184,0.664],"附近|fùjìn":["s3",18.098,0.715],"中间|zhōngjiān":["s3",19.064,0.701],"东|dōng":["s3",20.015,0.456],"南|nán":["s3",20.721,0.472],"西|xī":["s3",21.443,0.535],"北方|běifāng":["s3",22.229,0.697],"街道|jiēdào":["s3",23.176,0.673],"楼|lóu":["s3",24.098,0.469],"层|céng":["s3",24.817,0.532],"电梯|diàntī":["s3",25.6,0.71],"办公室|bàngōngshì":["s3",26.56,0.91],"银行|yínháng":["s3",27.72,0.682],"超市|chāoshì":["s3",28.653,0.772],"公园|gōngyuán":["s3",29.675,0.7],"图书馆|túshūguǎn":["s3",30.625,0.957],"洗手间|xǐshǒujiān":["s3",31.832,0.979],"地铁|dìtiě":["s3",33.061,0.75],"自行车|zìxíngchē":["s3",34.061,0.947],"船|chuán":["s3",35.258,0.521],"辆|liàng":["s3",36.029,0.482],"地图|dìtú":["s3",36.761,0.726],"护照|hùzhào":["s3",37.736,0.698],"行李箱|xínglixiāng":["s3",38.684,0.928],"起飞|qǐfēi":["s3",39.863,0.731],"春|chūn":["s3",40.844,0.511],"夏|xià":["s3",41.606,0.553],"秋|qiū":["s3",42.409,0.528],"冬|dōng":["s3",43.187,0.456],"季节|jìjié":["s3",43.894,0.755],"周末|zhōumò":["s3",44.899,0.685],"节日|jiérì":["s3",45.834,0.735],"刻|kè":["s3",46.818,0.503],"半|bàn":["s3",47.571,0.476],"以前|yǐqián":["s3",48.297,0.719],"以后|yǐhòu":["s3",49.265,0.66],"过去|guòqù":["s3",50.176,0.68],"刚才|gāngcái":["s3",51.106,0.741],"最近|zuìjìn":["s3",52.098,0.689],"马上|mǎshàng":["s3",53.036,0.716],"一会儿|yíhuìr":["s3",54.002,0.654],"先|xiān":["s3",54.906,0.559],"然后|ránhòu":["s3",55.715,0.7],"最后|zuìhòu":["s3",56.664,0.694],"终于|zhōngyú":["s3",57.609,0.693],"突然|tūrán":["s3",58.551,0.697],"经常|jīngcháng":["s3",59.498,0.758],"总是|zǒngshì":["s3",60.507,0.766],"一直|yìzhí":["s3",61.523,0.723],"一定|yídìng":["s3",62.496,0.646],"一共|yígòng":["s3",63.391,0.651],"一样|yíyàng":["s3",64.293,0.633],"一般|yìbān":["s3",65.176,0.623],"一边|yìbiān":["s3",66.049,0.655],"几乎|jīhū":["s3",66.954,0.734],"其实|qíshí":["s3",67.938,0.789],"当然|dāngrán":["s3",68.977,0.702],"如果|rúguǒ":["s3",69.929,0.725],"或者|huòzhě":["s3",70.904,0.699],"还是|háishi":["s3",71.854,0.763],"除了|chúle":["s3",72.867,0.67],"关于|guānyú":["s3",73.787,0.677],"根据|gēnjù":["s3",74.714,0.664],"为了|wèile":["s3",75.628,0.616],"为|wèi":["s3",76.494,0.493],"向|xiàng":["s3",77.237,0.554],"跟|gēn":["s3",78.041,0.455],"把|bǎ":["s3",78.746,0.456],"被|bèi":["s3",79.452,0.49],"才|cái":["s3",80.192,0.524],"只|zhǐ":["s3",80.966,0.479],"又|yòu":["s3",81.695,0.511],"更|gèng":["s3",82.457,0.713],"越|yuè":["s3",83.42,0.487],"极|jí":["s3",84.157,0.498],"特别|tèbié":["s3",84.905,0.716],"比较|bǐjiào":["s3",85.871,0.689],"必须|bìxū":["s3",86.81,0.699],"应该|yīnggāi":["s3",87.759,0.714],"愿意|yuànyì":["s3",88.723,0.68],"敢|gǎn":["s3",89.652,0.467],"需要|xūyào":["s3",90.369,0.734],"打算|dǎsuàn":["s3",91.353,0.697],"决定|juédìng":["s3",92.3,0.701],"选择|xuǎnzé":["s3",93.251,0.762],"同意|tóngyì":["s3",94.263,0.711],"认为|rènwéi":["s3",95.224,0.705],"相信|xiāngxìn":["s3",96.179,0.784],"记得|jìde":["s3",97.213,0.667],"忘记|wàngjì":["s3",98.13,0.731],"明白|míngbai":["s3",99.111,0.694],"了解|liǎojiě":["s3",100.055,0.716],"发现|fāxiàn":["s3",101.02,0.683],"检查|jiǎnchá":["s3",101.953,0.741],"解决|jiějué":["s3",102.944,0.739],"完成|wánchéng":["s3",103.933,0.738],"提高|tígāo":["s3",104.921,0.7],"练习|liànxí":["s3",105.871,0.757],"复习|fùxí":["s3",106.878,0.796],"努力|nǔlì":["s3",107.924,0.687],"参加|cānjiā":["s3",108.86,0.723],"见面|jiànmiàn":["s3",109.833,0.718],"聊天|liáotiān":["s3",110.801,0.732],"讲|jiǎng":["s3",111.783,0.498],"教|jiāo":["s3",112.531,0.49],"表示|biǎoshì":["s3",113.272,0.726],"借|jiè":["s3",114.248,0.489],"还|huán":["s3",114.986,0.476],"换|huàn":["s3",115.713,0.472],"用|yòng":["s3",116.435,0.494],"试|shì":["s3",117.179,0.535],"拿|ná":["s3",117.964,0.49],"放|fàng":["s3",118.704,0.459],"带|dài":["s3",119.413,0.486],"接|jiē":["s3",120.149,0.486],"搬|bān":["s3",120.885,0.463],"关|guān":["s3",121.598,0.467],"发|fā":["s3",122.315,0.465],"画|huà":["s3",123.03,0.494],"骑|qí":["s3",123.774,0.532],"站|zhàn":["s3",124.557,0.497],"长|zhǎng":["s3",125.304,0.467],"像|xiàng":["s3",126.021,0.554],"离开|líkāi":["s3",126.826,0.733],"迟到|chídào":["s3",127.809,0.704],"请假|qǐngjià":["s3",128.763,0.714],"上网|shàngwǎng":["s3",129.727,0.748],"爬山|páshān":["s3",130.725,0.708],"锻炼|duànliàn":["s3",131.683,0.677],"打扫|dǎsǎo":["s3",132.61,0.715],"洗澡|xǐzǎo":["s3",133.576,0.772],"刷牙|shuāyá":["s3",134.598,0.781],"结婚|jiéhūn":["s3",135.629,0.716],"留学|liúxué":["s3",136.596,0.779],"照顾|zhàogu":["s3",137.625,0.684],"关心|guānxīn":["s3",138.559,0.68],"担心|dānxīn":["s3",139.489,0.68],"放心|fàngxīn":["s3",140.419,0.705],"害怕|hàipà":["s3",141.375,0.694],"生气|shēngqì":["s3",142.318,0.808],"着急|zháojí":["s3",143.376,0.731],"难过|nánguò":["s3",144.357,0.728],"满意|mǎnyì":["s3",145.335,0.694],"欢迎|huānyíng":["s3",146.279,0.702],"哭|kū":["s3",147.232,0.496],"疼|téng":["s3",147.977,0.488],"发烧|fāshāo":["s3",148.715,0.693],"感冒|gǎnmào":["s3",149.658,0.676],"健康|jiànkāng":["s3",150.584,0.717],"舒服|shūfu":["s3",151.551,0.797],"饿|è":["s3",152.598,0.495],"渴|kě":["s3",153.343,0.504],"饱|bǎo":["s3",154.097,0.417],"脸|liǎn":["s3",154.764,0.508],"鼻子|bízi":["s3",155.521,0.679],"耳朵|ěrduo":["s3",156.45,0.673],"嘴|zuǐ":["s3",157.373,0.504],"头发|tóufa":["s3",158.128,0.681],"脚|jiǎo":["s3",159.059,0.503],"腿|tuǐ":["s3",159.811,0.529],"矮|ǎi":["s3",160.591,0.51],"胖|pàng":["s3",161.351,0.494],"瘦|shòu":["s3",162.095,0.555],"可爱|kěài":["s3",162.9,0.663],"聪明|cōngming":["s3",163.813,0.718],"认真|rènzhēn":["s3",164.78,0.717],"热情|rèqíng":["s3",165.748,0.826],"安静|ānjìng":["s3",166.823,0.711],"干净|gānjìng":["s3",167.785,0.7],"简单|jiǎndān":["s3",168.735,0.685],"容易|róngyì":["s3",169.67,0.706],"难|nán":["s3",170.626,0.472],"方便|fāngbiàn":["s3",171.348,0.664],"奇怪|qíguài":["s3",172.262,0.764],"清楚|qīngchu":["s3",173.275,0.732],"重要|zhòngyào":["s3",174.258,0.665],"主要|zhǔyào":["s3",175.173,0.669],"有名|yǒumíng":["s3",176.092,0.692],"新鲜|xīnxiān":["s3",177.034,0.774],"甜|tián":["s3",178.057,0.523],"旧|jiù":["s3",178.83,0.492],"老|lǎo":["s3",179.572,0.452],"坏|huài":["s3",180.274,0.514],"短|duǎn":["s3",181.038,0.491],"低|dī":["s3",181.779,0.451],"久|jiǔ":["s3",182.48,0.483],"小心|xiǎoxīn":["s3",183.213,0.736],"蓝|lán":["s3",184.2,0.472],"绿|lǜ":["s3",184.922,0.458],"菜单|càidān":["s3",185.63,0.7],"面包|miànbāo":["s3",186.58,0.685],"蛋糕|dàngāo":["s3",187.515,0.673],"香蕉|xiāngjiāo":["s3",188.438,0.755],"果汁|guǒzhī":["s3",189.443,0.721],"饮料|yǐnliào":["s3",190.414,0.689],"啤酒|píjiǔ":["s3",191.353,0.735],"碗|wǎn":["s3",192.338,0.478],"盘子|pánzi":["s3",193.066,0.705],"筷子|kuàizi":["s3",194.02,0.707],"瓶子|píngzi":["s3",194.977,0.704],"冰箱|bīngxiāng":["s3",195.931,0.728],"空调|kōngtiáo":["s3",196.909,0.703],"灯|dēng":["s3",197.862,0.448],"伞|sǎn":["s3",198.56,0.573],"包|bāo":["s3",199.382,0.461],"帽子|màozi":["s3",200.093,0.684],"衬衫|chènshān":["s3",201.027,0.759],"裤子|kùzi":["s3",202.036,0.713],"裙子|qúnzi":["s3",202.999,0.719],"皮鞋|píxié":["s3",203.968,0.782],"双|shuāng":["s3",205.0,0.547],"条|tiáo":["s3",205.797,0.504],"张|zhāng":["s3",206.551,0.433],"位|wèi":["s3",207.234,0.493],"种|zhǒng":["s3",207.977,0.49],"段|duàn":["s3",208.717,0.473],"万|wàn":["s3",209.44,0.492],"元|yuán":["s3",210.183,0.466],"角|jiǎo":["s3",210.899,0.503],"公斤|gōngjīn":["s3",211.652,0.675],"米|mǐ":["s3",212.576,0.456],"照片|zhàopiàn":["s3",213.282,0.758],"照相机|zhàoxiàngjī":["s3",214.29,0.934],"电子邮件|diànzǐyóujiàn":["s3",215.474,1.055],"新闻|xīnwén":["s3",216.78,0.762],"节目|jiémù":["s3",217.792,0.708],"游戏|yóuxì":["s3",218.75,0.737],"音乐|yīnyuè":["s3",219.737,0.712],"故事|gùshi":["s3",220.7,0.701],"句子|jùzi":["s3",221.651,0.695],"词典|cídiǎn":["s3",222.596,0.77],"作业|zuòyè":["s3",223.616,0.722],"成绩|chéngjì":["s3",224.588,0.747],"水平|shuǐpíng":["s3",225.584,0.813],"数学|shùxué":["s3",226.647,0.832],"历史|lìshǐ":["s3",227.729,0.769],"文化|wénhuà":["s3",228.748,0.697],"中文|Zhōngwén":["s3",229.695,0.698],"体育|tǐyù":["s3",230.643,0.688],"比赛|bǐsài":["s3",231.581,0.684],"会议|huìyì":["s3",232.515,0.706],"机会|jīhuì":["s3",233.471,0.699],"办法|bànfǎ":["s3",234.42,0.686],"兴趣|xìngqù":["s3",235.356,0.768],"爱好|àihào":["s3",236.374,0.653],"习惯|xíguàn":["s3",237.276,0.768],"关系|guānxi":["s3",238.294,0.686],"环境|huánjìng":["s3",239.23,0.721],"变化|biànhuà":["s3",240.201,0.719],"礼物|lǐwù":["s3",241.171,0.665],"声音|shēngyīn":["s3",242.086,0.745],"太阳|tàiyáng":["s3",243.081,0.718],"月亮|yuèliang":["s3",244.049,0.675],"云|yún":["s3",244.974,0.464],"刮风|guāfēng":["s3",245.688,0.691],"树|shù":["s3",246.629,0.557],"花|huā":["s3",247.436,0.48],"草|cǎo":["s3",248.167,0.498],"河|hé":["s3",248.915,0.528],"动物|dòngwù":["s3",249.693,0.618],"鸟|niǎo":["s3",250.561,0.485],"马|mǎ":["s3",251.295,0.457],"熊猫|xióngmāo":["s3",252.002,0.732],"s:你好，我叫王明。":["sen",0.0,1.692],"ss:你好，我叫王明。":["sen",1.942,2.589],"s:你叫什么名字？":["sen",4.781,1.272],"ss:你叫什么名字？":["sen",6.304,1.921],"s:认识你很高兴。":["sen",8.475,1.377],"ss:认识你很高兴。":["sen",10.101,2.082],"s:你是哪国人？":["sen",12.433,1.202],"ss:你是哪国人？":["sen",13.885,1.81],"s:我是菲律宾人。":["sen",15.945,1.385],"ss:我是菲律宾人。":["sen",17.58,2.095],"s:这个多少钱？":["sen",19.925,1.209],"ss:这个多少钱？":["sen",21.384,1.821],"s:我想喝茶。":["sen",23.455,1.077],"ss:我想喝茶。":["sen",24.782,1.606],"s:我不会说汉语。":["sen",26.639,1.313],"ss:我不会说汉语。":["sen",28.202,1.969],"s:你会说英语吗？":["sen",30.42,1.314],"ss:你会说英语吗？":["sen",31.985,1.978],"s:今天天气很好。":["sen",34.212,1.461],"ss:今天天气很好。":["sen",35.923,2.221],"s:现在几点？":["sen",38.394,1.089],"ss:现在几点？":["sen",39.732,1.625],"s:我明天去北京。":["sen",41.607,1.351],"ss:我明天去北京。":["sen",43.208,2.044],"s:你家有几个人？":["sen",45.502,1.293],"ss:你家有几个人？":["sen",47.044,1.954],"s:我喜欢看电影。":["sen",49.249,1.392],"ss:我喜欢看电影。":["sen",50.891,2.105],"s:他是我的朋友。":["sen",53.246,1.223],"ss:他是我的朋友。":["sen",54.719,1.849],"s:你在哪儿工作？":["sen",56.818,1.18],"ss:你在哪儿工作？":["sen",58.248,1.784],"s:我在学校学习汉语。":["sen",60.283,1.75],"ss:我在学校学习汉语。":["sen",62.282,2.673],"s:太贵了！":["sen",65.206,0.827],"ss:太贵了！":["sen",66.283,1.195],"s:便宜一点儿吧。":["sen",67.728,1.073],"ss:便宜一点儿吧。":["sen",69.051,1.595],"s:请再说一次。":["sen",70.896,1.192],"ss:请再说一次。":["sen",72.338,1.798],"s:我听不懂。":["sen",74.386,0.967],"ss:我听不懂。":["sen",75.603,1.426],"s:你吃饭了吗？":["sen",77.279,1.07],"ss:你吃饭了吗？":["sen",78.599,1.601],"s:我已经吃了。":["sen",80.45,1.059],"ss:我已经吃了。":["sen",81.759,1.572],"s:我们一起去吧！":["sen",83.58,1.167],"ss:我们一起去吧！":["sen",84.997,1.753],"s:你觉得怎么样？":["sen",87.0,1.155],"ss:你觉得怎么样？":["sen",88.405,1.728],"s:机场离这儿远吗？":["sen",90.383,1.348],"ss:机场离这儿远吗？":["sen",91.981,2.033],"s:我每天早上跑步。":["sen",94.264,1.536],"ss:我每天早上跑步。":["sen",96.05,2.339],"s:因为下雨，所以我没去。":["sen",98.639,2.17],"ss:因为下雨，所以我没去。":["sen",101.059,3.335],"s:洗手间在哪儿？":["sen",104.644,1.247],"ss:洗手间在哪儿？":["sen",106.142,1.868],"s:你最近怎么样？":["sen",108.26,1.168],"ss:你最近怎么样？":["sen",109.677,1.747],"s:请帮我拿一下。":["sen",111.674,1.183],"ss:请帮我拿一下。":["sen",113.108,1.782],"s:别担心，我马上就到。":["sen",115.14,2.052],"ss:别担心，我马上就到。":["sen",117.442,3.159],"s:我的汉语水平提高了。":["sen",120.851,1.784],"ss:我的汉语水平提高了。":["sen",122.885,2.735],"s:如果明天不下雨，我们就去爬山。":["sen",125.87,2.767],"ss:如果明天不下雨，我们就去爬山。":["sen",128.888,4.273],"s:这家饭店的菜又便宜又好吃。":["sen",133.411,2.732],"ss:这家饭店的菜又便宜又好吃。":["sen",136.393,4.246],"s:我对中国文化很感兴趣。":["sen",140.89,2.128],"ss:我对中国文化很感兴趣。":["sen",143.267,3.269]},"carrier":{"的|de":["我的","wǒ de"],"吗|ma":["好吗","hǎo ma"],"呢|ne":["你呢","nǐ ne"],"了|le":["好了","hǎo le"],"吧|ba":["走吧","zǒu ba"],"着|zhe":["看着","kàn zhe"],"过|guo":["去过","qù guo"],"得|de":["跑得快","pǎo de kuài"],"更|gèng":["更好","gèng hǎo"]}};
+
+// Generated by tools/make_audio.py — recorded clips (es-MX-DaliaNeural): key -> [file, start s, length s]
+(window.MC_AUDIO_BY ||= {}).es = {"clips":{"hola|":["es-s1",0.0,0.552],"adiós|":["es-s1",0.802,0.798],"buenos días|":["es-s1",1.85,1.131],"buenas tardes|":["es-s1",3.231,1.304],"buenas noches|":["es-s1",4.785,1.309],"gracias|":["es-s1",6.344,0.995],"de nada|":["es-s1",7.59,0.832],"por favor|":["es-s1",8.672,0.774],"perdón|":["es-s1",9.696,0.674],"lo siento|":["es-s1",10.62,0.913],"sí|":["es-s1",11.783,0.535],"no|":["es-s1",12.568,0.48],"¿cómo estás?|":["es-s1",13.297,1.018],"bien|":["es-s1",14.565,0.617],"mal|":["es-s1",15.432,0.548],"mucho gusto|":["es-s1",16.23,1.074],"me llamo…|":["es-s1",17.553,0.809],"¿cómo te llamas?|":["es-s1",18.613,1.172],"yo|":["es-s1",20.035,0.524],"tú|":["es-s1",20.809,0.391],"usted|":["es-s1",21.45,0.704],"él|":["es-s1",22.404,0.466],"ella|":["es-s1",23.12,0.666],"nosotros|":["es-s1",24.036,1.08],"ustedes|":["es-s1",25.366,0.983],"ellos|":["es-s1",26.599,0.823],"ser|":["es-s1",27.672,0.622],"estar|":["es-s1",28.544,0.743],"tener|":["es-s1",29.537,0.586],"hay|":["es-s1",30.373,0.505],"cero|":["es-s1",31.128,0.687],"uno|":["es-s1",32.065,0.589],"dos|":["es-s1",32.904,0.681],"tres|":["es-s1",33.835,0.654],"cuatro|":["es-s1",34.739,0.595],"cinco|":["es-s1",35.583,0.745],"seis|":["es-s1",36.578,0.781],"siete|":["es-s1",37.609,0.779],"ocho|":["es-s1",38.638,0.663],"nueve|":["es-s1",39.552,0.703],"diez|":["es-s1",40.504,0.856],"la familia|":["es-s1",41.61,0.957],"el padre|":["es-s1",42.817,0.864],"la madre|":["es-s1",43.932,0.81],"el papá|":["es-s1",44.992,0.854],"la mamá|":["es-s1",46.096,0.766],"el hermano|":["es-s1",47.112,0.891],"la hermana|":["es-s1",48.253,0.96],"el hijo|":["es-s1",49.463,0.722],"la hija|":["es-s1",50.435,0.823],"el amigo|":["es-s1",51.508,0.863],"la amiga|":["es-s1",52.621,0.931],"el hombre|":["es-s1",53.802,0.769],"la mujer|":["es-s1",54.821,0.848],"el niño|":["es-s1",55.919,0.883],"la niña|":["es-s1",57.052,0.849],"el señor|":["es-s1",58.151,0.878],"la señora|":["es-s1",59.279,0.91],"el profesor|":["es-s1",60.439,0.962],"la profesora|":["es-s1",61.65,1.029],"el estudiante|":["es-s1",62.93,1.105],"hoy|":["es-s1",64.285,0.465],"mañana|":["es-s1",65.001,0.78],"ayer|":["es-s1",66.03,0.711],"ahora|":["es-s1",66.992,0.743],"el día|":["es-s1",67.984,0.817],"la semana|":["es-s1",69.051,0.974],"el mes|":["es-s1",70.275,0.84],"el año|":["es-s1",71.364,0.76],"la hora|":["es-s1",72.374,0.801],"¿qué hora es?|":["es-s1",73.425,1.068],"lunes|":["es-s1",74.744,0.867],"martes|":["es-s1",75.861,0.965],"miércoles|":["es-s1",77.076,1.16],"jueves|":["es-s1",78.485,0.802],"viernes|":["es-s1",79.538,0.952],"sábado|":["es-s1",80.74,0.815],"domingo|":["es-s1",81.805,0.747],"el agua|":["es-s1",82.802,0.806],"el café|":["es-s1",83.858,0.815],"el té|":["es-s1",84.923,0.74],"la leche|":["es-s1",85.913,0.915],"el pan|":["es-s1",87.078,0.775],"el arroz|":["es-s1",88.103,0.882],"la carne|":["es-s1",89.235,0.871],"el pollo|":["es-s1",90.356,0.85],"el pescado|":["es-s1",91.456,0.92],"la fruta|":["es-s1",92.626,0.869],"la manzana|":["es-s1",93.745,1.01],"el jugo|":["es-s1",95.006,0.864],"la comida|":["es-s1",96.12,0.893],"el desayuno|":["es-s1",97.262,1.033],"el almuerzo|":["es-s1",98.545,0.982],"la cena|":["es-s1",99.777,0.892],"la casa|":["es-s1",100.918,0.837],"la escuela|":["es-s1",102.005,0.839],"el trabajo|":["es-s1",103.094,0.946],"la ciudad|":["es-s1",104.29,0.899],"el país|":["es-s1",105.439,0.957],"el hotel|":["es-s1",106.646,0.795],"el restaurante|":["es-s1",107.691,1.28],"la tienda|":["es-s1",109.221,0.829],"el baño|":["es-s1",110.3,0.817],"la calle|":["es-s1",111.368,0.857],"el carro|":["es-s1",112.474,0.813],"el autobús|":["es-s1",113.538,1.077],"el dinero|":["es-s1",114.865,0.866],"el teléfono|":["es-s1",115.981,1.038],"el libro|":["es-s1",117.269,0.816],"la mesa|":["es-s1",118.335,0.829],"la silla|":["es-s1",119.414,0.92],"la puerta|":["es-s1",120.584,0.887],"comer|":["es-s1",121.721,0.597],"beber|":["es-s1",122.568,0.686],"hablar|":["es-s1",123.504,0.696],"ir|":["es-s1",124.451,0.469],"venir|":["es-s1",125.169,0.69],"querer|":["es-s1",126.109,0.631],"poder|":["es-s1",126.991,0.622],"hacer|":["es-s1",127.863,0.664],"ver|":["es-s1",128.777,0.56],"mirar|":["es-s1",129.587,0.663],"escuchar|":["es-s1",130.501,0.852],"leer|":["es-s1",131.603,0.779],"escribir|":["es-s1",132.632,0.864],"vivir|":["es-s1",133.746,0.721],"trabajar|":["es-s1",134.717,0.832],"estudiar|":["es-s1",135.798,0.868],"comprar|":["es-s1",136.916,0.709],"dormir|":["es-s1",137.875,0.757],"gustar|":["es-s1",138.882,0.753],"saber|":["es-s1",139.885,0.764],"conocer|":["es-s1",140.9,0.843],"bueno|":["es-s1",141.993,0.69],"malo|":["es-s1",142.933,0.657],"grande|":["es-s1",143.839,0.794],"pequeño|":["es-s1",144.883,0.765],"nuevo|":["es-s1",145.898,0.735],"viejo|":["es-s1",146.883,0.77],"caliente|":["es-s1",147.903,0.863],"frío|":["es-s1",149.016,0.673],"bonito|":["es-s1",149.94,0.772],"feliz|":["es-s1",150.962,0.861],"cansado|":["es-s1",152.073,0.779],"muy|":["es-s1",153.102,0.617],"también|":["es-s1",153.97,0.752],"y|":["es-s1",154.972,0.793],"o|":["es-s1",156.015,0.39],"pero|":["es-s1",156.655,0.524],"con|":["es-s1",157.429,0.487],"sin|":["es-s1",158.167,0.67],"en|":["es-s1",159.087,0.468],"de|":["es-s1",159.805,0.493],"a|":["es-s1",160.548,0.406],"¿qué?|":["es-s1",161.204,0.413],"¿quién?|":["es-s1",161.867,0.472],"¿dónde?|":["es-s1",162.589,0.665],"¿cuándo?|":["es-s1",163.504,0.558],"¿cómo?|":["es-s1",164.312,0.543],"¿por qué?|":["es-s1",165.104,0.708],"¿cuánto?|":["es-s1",166.062,0.609],"porque|":["es-s1",166.922,0.605],"once|":["es-s2",0.0,0.71],"doce|":["es-s2",0.96,0.696],"trece|":["es-s2",1.906,0.647],"catorce|":["es-s2",2.803,0.824],"quince|":["es-s2",3.877,0.676],"veinte|":["es-s2",4.804,0.764],"treinta|":["es-s2",5.818,0.676],"cuarenta|":["es-s2",6.744,0.718],"cincuenta|":["es-s2",7.712,1.003],"cien|":["es-s2",8.965,0.653],"mil|":["es-s2",9.868,0.559],"primero|":["es-s2",10.677,0.726],"segundo|":["es-s2",11.653,0.871],"último|":["es-s2",12.774,0.758],"la mañana|":["es-s2",13.782,0.929],"la tarde|":["es-s2",14.96,0.864],"la noche|":["es-s2",16.074,0.887],"el fin de semana|":["es-s2",17.211,1.285],"temprano|":["es-s2",18.747,0.785],"tarde|":["es-s2",19.781,0.607],"siempre|":["es-s2",20.638,0.758],"nunca|":["es-s2",21.647,0.75],"a veces|":["es-s2",22.647,0.955],"otra vez|":["es-s2",23.852,0.983],"ya|":["es-s2",25.085,0.557],"todavía|":["es-s2",25.892,0.862],"enero|":["es-s2",27.004,0.715],"febrero|":["es-s2",27.969,0.818],"marzo|":["es-s2",29.037,0.726],"abril|":["es-s2",30.012,0.662],"mayo|":["es-s2",30.924,0.686],"junio|":["es-s2",31.861,0.672],"julio|":["es-s2",32.783,0.698],"agosto|":["es-s2",33.731,0.893],"septiembre|":["es-s2",34.874,0.906],"octubre|":["es-s2",36.03,0.774],"noviembre|":["es-s2",37.055,0.931],"diciembre|":["es-s2",38.236,0.908],"el cumpleaños|":["es-s2",39.394,1.282],"la fiesta|":["es-s2",40.925,0.94],"el esposo|":["es-s2",42.115,0.956],"la esposa|":["es-s2",43.321,0.911],"el abuelo|":["es-s2",44.482,0.882],"la abuela|":["es-s2",45.614,0.932],"el tío|":["es-s2",46.796,0.806],"la tía|":["es-s2",47.852,0.805],"el bebé|":["es-s2",48.907,0.748],"la gente|":["es-s2",49.905,0.96],"el perro|":["es-s2",51.115,0.866],"el gato|":["es-s2",52.231,0.773],"el cuerpo|":["es-s2",53.254,0.917],"la cabeza|":["es-s2",54.421,0.931],"los ojos|":["es-s2",55.602,1.026],"la boca|":["es-s2",56.878,0.755],"la mano|":["es-s2",57.883,0.784],"el pie|":["es-s2",58.917,0.763],"el médico|":["es-s2",59.93,0.991],"el hospital|":["es-s2",61.172,0.993],"la farmacia|":["es-s2",62.415,1.04],"el mercado|":["es-s2",63.705,0.96],"el supermercado|":["es-s2",64.915,1.29],"el banco|":["es-s2",66.455,0.857],"la iglesia|":["es-s2",67.563,0.96],"el parque|":["es-s2",68.772,0.878],"la playa|":["es-s2",69.9,0.869],"el aeropuerto|":["es-s2",71.019,1.219],"el avión|":["es-s2",72.488,0.801],"el tren|":["es-s2",73.539,0.792],"la estación|":["es-s2",74.581,0.952],"el boleto|":["es-s2",75.782,0.933],"el cuarto|":["es-s2",76.965,0.964],"la cocina|":["es-s2",78.179,0.919],"la cama|":["es-s2",79.348,0.817],"la ventana|":["es-s2",80.415,0.975],"la ropa|":["es-s2",81.641,0.833],"la camisa|":["es-s2",82.723,0.939],"los zapatos|":["es-s2",83.912,1.14],"el color|":["es-s2",85.302,0.821],"rojo|":["es-s2",86.373,0.678],"azul|":["es-s2",87.301,0.647],"verde|":["es-s2",88.198,0.625],"amarillo|":["es-s2",89.073,0.899],"blanco|":["es-s2",90.222,0.766],"negro|":["es-s2",91.238,0.737],"el huevo|":["es-s2",92.225,0.804],"la papa|":["es-s2",93.279,0.901],"el queso|":["es-s2",94.43,0.844],"la sopa|":["es-s2",95.524,0.856],"el azúcar|":["es-s2",96.63,0.995],"la sal|":["es-s2",97.876,0.803],"la cerveza|":["es-s2",98.929,1.009],"el vino|":["es-s2",100.187,0.793],"el plato|":["es-s2",101.23,0.835],"el vaso|":["es-s2",102.315,0.832],"la cuenta|":["es-s2",103.397,0.906],"el precio|":["es-s2",104.553,0.918],"barato|":["es-s2",105.721,0.761],"caro|":["es-s2",106.732,0.595],"abrir|":["es-s2",107.577,0.69],"cerrar|":["es-s2",108.517,0.818],"empezar|":["es-s2",109.585,0.871],"terminar|":["es-s2",110.706,0.768],"llegar|":["es-s2",111.724,0.681],"salir|":["es-s2",112.656,0.76],"entrar|":["es-s2",113.666,0.714],"volver|":["es-s2",114.629,0.782],"esperar|":["es-s2",115.661,0.818],"buscar|":["es-s2",116.729,0.752],"encontrar|":["es-s2",117.732,0.898],"dar|":["es-s2",118.879,0.542],"tomar|":["es-s2",119.672,0.595],"llevar|":["es-s2",120.516,0.685],"pagar|":["es-s2",121.452,0.616],"vender|":["es-s2",122.318,0.77],"necesitar|":["es-s2",123.338,1.097],"ayudar|":["es-s2",124.685,0.77],"preguntar|":["es-s2",125.704,0.888],"contestar|":["es-s2",126.842,0.955],"entender|":["es-s2",128.047,0.912],"pensar|":["es-s2",129.209,0.756],"creer|":["es-s2",130.216,0.656],"decir|":["es-s2",131.121,0.716],"llamar|":["es-s2",132.088,0.693],"jugar|":["es-s2",133.031,0.727],"cantar|":["es-s2",134.007,0.692],"bailar|":["es-s2",134.95,0.786],"caminar|":["es-s2",135.986,0.735],"correr|":["es-s2",136.971,0.671],"nadar|":["es-s2",137.892,0.729],"cocinar|":["es-s2",138.871,0.799],"limpiar|":["es-s2",139.92,0.806],"lavar|":["es-s2",140.976,0.665],"viajar|":["es-s2",141.891,0.756],"alto|":["es-s2",142.898,0.662],"bajo|":["es-s2",143.809,0.624],"largo|":["es-s2",144.683,0.689],"corto|":["es-s2",145.622,0.676],"fácil|":["es-s2",146.549,0.762],"difícil|":["es-s2",147.561,0.875],"rápido|":["es-s2",148.686,0.833],"lento|":["es-s2",149.77,0.703],"cerca|":["es-s2",150.722,0.753],"lejos|":["es-s2",151.725,0.878],"aquí|":["es-s2",152.853,0.652],"allí|":["es-s2",153.754,0.693],"este|":["es-s2",154.697,0.765],"ese|":["es-s2",155.712,0.619],"mucho|":["es-s2",156.581,0.714],"poco|":["es-s2",157.545,0.573],"más|":["es-s2",158.367,0.67],"menos|":["es-s2",159.287,0.888],"todo|":["es-s2",160.424,0.552],"nada|":["es-s2",161.226,0.666],"algo|":["es-s2",162.142,0.632],"alguien|":["es-s2",163.024,0.784],"nadie|":["es-s2",164.058,0.726],"el tiempo|":["es-s3",0.0,0.916],"hace calor|":["es-s3",1.166,0.979],"hace frío|":["es-s3",2.396,0.927],"llover|":["es-s3",3.573,0.755],"la lluvia|":["es-s3",4.578,0.824],"el sol|":["es-s3",5.652,0.747],"la luna|":["es-s3",6.648,0.747],"el cielo|":["es-s3",7.645,0.845],"el mar|":["es-s3",8.74,0.706],"el río|":["es-s3",9.696,0.836],"la montaña|":["es-s3",10.782,0.984],"el árbol|":["es-s3",12.016,0.828],"la flor|":["es-s3",13.094,0.741],"el animal|":["es-s3",14.085,0.908],"el pájaro|":["es-s3",15.243,0.989],"el mundo|":["es-s3",16.482,0.848],"la vida|":["es-s3",17.58,0.787],"el amor|":["es-s3",18.618,0.725],"la salud|":["es-s3",19.592,0.8],"enfermo|":["es-s3",20.642,0.903],"el dolor|":["es-s3",21.795,0.808],"la medicina|":["es-s3",22.853,1.057],"la pregunta|":["es-s3",24.16,1.022],"la respuesta|":["es-s3",25.431,1.105],"el problema|":["es-s3",26.787,0.904],"la idea|":["es-s3",27.94,0.866],"la palabra|":["es-s3",29.056,0.899],"el idioma|":["es-s3",30.206,0.81],"el español|":["es-s3",31.266,0.933],"el inglés|":["es-s3",32.449,0.959],"la clase|":["es-s3",33.657,0.832],"la tarea|":["es-s3",34.739,0.929],"el examen|":["es-s3",35.918,0.998],"la universidad|":["es-s3",37.166,1.263],"la oficina|":["es-s3",38.679,1.053],"la empresa|":["es-s3",39.982,0.97],"el jefe|":["es-s3",41.201,0.831],"la reunión|":["es-s3",42.283,0.944],"el correo|":["es-s3",43.477,0.989],"la computadora|":["es-s3",44.716,1.181],"el celular|":["es-s3",46.147,0.978],"la foto|":["es-s3",47.376,0.823],"la música|":["es-s3",48.449,0.967],"la película|":["es-s3",49.666,1.039],"el juego|":["es-s3",50.955,0.82],"el deporte|":["es-s3",52.025,1.048],"el fútbol|":["es-s3",53.323,0.843],"la noticia|":["es-s3",54.416,0.958],"la historia|":["es-s3",55.624,0.921],"la cultura|":["es-s3",56.795,0.914],"el centro|":["es-s3",57.959,0.87],"la esquina|":["es-s3",59.079,0.86],"a la derecha|":["es-s3",60.189,0.992],"a la izquierda|":["es-s3",61.431,1.072],"derecho|":["es-s3",62.753,0.795],"la dirección|":["es-s3",63.798,0.988],"el mapa|":["es-s3",65.036,0.846],"el viaje|":["es-s3",66.131,0.865],"la maleta|":["es-s3",67.246,0.942],"el pasaporte|":["es-s3",68.438,1.208],"las vacaciones|":["es-s3",69.896,1.38],"el regalo|":["es-s3",71.526,0.917],"la cita|":["es-s3",72.693,0.866],"recordar|":["es-s3",73.809,0.868],"olvidar|":["es-s3",74.927,0.803],"aprender|":["es-s3",75.98,0.894],"enseñar|":["es-s3",77.123,0.909],"explicar|":["es-s3",78.282,0.943],"practicar|":["es-s3",79.475,0.934],"mejorar|":["es-s3",80.659,0.774],"cambiar|":["es-s3",81.683,0.724],"usar|":["es-s3",82.657,0.646],"poner|":["es-s3",83.554,0.585],"traer|":["es-s3",84.389,0.713],"mandar|":["es-s3",85.352,0.689],"recibir|":["es-s3",86.29,0.842],"ganar|":["es-s3",87.383,0.715],"perder|":["es-s3",88.348,0.707],"sentir|":["es-s3",89.305,0.851],"parecer|":["es-s3",90.406,0.77],"deber|":["es-s3",91.426,0.716],"intentar|":["es-s3",92.393,0.905],"dejar|":["es-s3",93.548,0.728],"seguir|":["es-s3",94.526,0.804],"subir|":["es-s3",95.58,0.769],"bajar|":["es-s3",96.599,0.725],"manejar|":["es-s3",97.573,0.846],"descansar|":["es-s3",98.669,1.013],"despertarse|":["es-s3",99.932,1.165],"levantarse|":["es-s3",101.347,0.978],"ducharse|":["es-s3",102.575,0.908],"vestirse|":["es-s3",103.732,0.988],"casarse|":["es-s3",104.971,0.901],"preocuparse|":["es-s3",106.122,1.054],"el miedo|":["es-s3",107.426,0.813],"la verdad|":["es-s3",108.489,0.805],"la mentira|":["es-s3",109.544,0.978],"importante|":["es-s3",110.772,1.116],"interesante|":["es-s3",112.139,1.113],"aburrido|":["es-s3",113.502,0.848],"contento|":["es-s3",114.6,0.875],"triste|":["es-s3",115.725,0.809],"enojado|":["es-s3",116.784,0.81],"nervioso|":["es-s3",117.844,0.968],"listo|":["es-s3",119.062,0.752],"ocupado|":["es-s3",120.065,0.865],"libre|":["es-s3",121.18,0.641],"lleno|":["es-s3",122.071,0.656],"vacío|":["es-s3",122.977,0.824],"limpio|":["es-s3",124.051,0.757],"sucio|":["es-s3",125.058,0.842],"fuerte|":["es-s3",126.15,0.755],"débil|":["es-s3",127.155,0.679],"joven|":["es-s3",128.084,0.693],"mayor|":["es-s3",129.027,0.663],"mejor|":["es-s3",129.94,0.65],"peor|":["es-s3",130.84,0.547],"igual|":["es-s3",131.637,0.735],"diferente|":["es-s3",132.622,1.028],"posible|":["es-s3",133.9,0.796],"seguro|":["es-s3",134.945,0.79],"otro|":["es-s3",135.986,0.614],"cada|":["es-s3",136.849,0.515],"mismo|":["es-s3",137.614,0.69],"solo|":["es-s3",138.554,0.712],"juntos|":["es-s3",139.516,0.911],"casi|":["es-s3",140.677,0.606],"bastante|":["es-s3",141.532,1.0],"demasiado|":["es-s3",142.782,0.926],"pronto|":["es-s3",143.958,0.689],"luego|":["es-s3",144.897,0.665],"después|":["es-s3",145.812,0.901],"antes|":["es-s3",146.963,0.89],"durante|":["es-s3",148.103,0.839],"mientras|":["es-s3",149.192,0.917],"entonces|":["es-s3",150.359,1.032],"si|":["es-s3",151.641,0.457],"cuando|":["es-s3",152.347,0.627],"aunque|":["es-s3",153.224,0.693],"para|":["es-s3",154.166,0.493],"por|":["es-s3",154.909,0.417],"entre|":["es-s3",155.576,0.579],"sobre|":["es-s3",156.404,0.683],"debajo de|":["es-s3",157.337,1.012],"encima de|":["es-s3",158.599,0.991],"delante de|":["es-s3",159.84,1.056],"detrás de|":["es-s3",161.145,1.076],"al lado de|":["es-s3",162.471,1.05],"dentro de|":["es-s3",163.771,0.931],"fuera de|":["es-s3",164.952,0.851],"s:Hola, me llamo Ana.":["es-sen",0.0,1.581],"ss:Hola, me llamo Ana.":["es-sen",1.831,2.253],"s:¿Cómo te llamas?":["es-sen",4.333,1.118],"ss:¿Cómo te llamas?":["es-sen",5.701,1.553],"s:Mucho gusto.":["es-sen",7.504,1.024],"ss:Mucho gusto.":["es-sen",8.778,1.417],"s:Soy de Filipinas.":["es-sen",10.445,1.419],"ss:Soy de Filipinas.":["es-sen",12.114,2.016],"s:¿Cómo estás?":["es-sen",14.38,0.969],"ss:¿Cómo estás?":["es-sen",15.599,1.33],"s:Estoy bien, gracias.":["es-sen",17.179,1.73],"ss:Estoy bien, gracias.":["es-sen",19.159,2.444],"s:¿Cuánto cuesta?":["es-sen",21.853,0.994],"ss:¿Cuánto cuesta?":["es-sen",23.097,1.384],"s:Quiero un café, por favor.":["es-sen",24.731,1.845],"ss:Quiero un café, por favor.":["es-sen",26.826,2.645],"s:No hablo mucho español.":["es-sen",29.721,1.604],"ss:No hablo mucho español.":["es-sen",31.575,2.274],"s:¿Hablas inglés?":["es-sen",34.099,1.123],"ss:¿Hablas inglés?":["es-sen",35.472,1.562],"s:¿Dónde está el baño?":["es-sen",37.284,1.194],"ss:¿Dónde está el baño?":["es-sen",38.728,1.689],"s:Tengo dos hermanos.":["es-sen",40.667,1.437],"ss:Tengo dos hermanos.":["es-sen",42.354,2.032],"s:Hoy es lunes.":["es-sen",44.636,1.109],"ss:Hoy es lunes.":["es-sen",45.995,1.551],"s:Me gusta la comida filipina.":["es-sen",47.796,1.914],"ss:Me gusta la comida filipina.":["es-sen",49.96,2.737],"s:Vivo en una casa grande.":["es-sen",52.948,1.625],"ss:Vivo en una casa grande.":["es-sen",54.823,2.302],"s:¿Puedes repetir, por favor?":["es-sen",57.375,1.992],"ss:¿Puedes repetir, por favor?":["es-sen",59.617,2.849],"s:No entiendo.":["es-sen",62.716,1.016],"ss:No entiendo.":["es-sen",63.982,1.414],"s:Es muy caro.":["es-sen",65.646,1.019],"ss:Es muy caro.":["es-sen",66.915,1.412],"s:¿A qué hora llega el autobús?":["es-sen",68.578,1.91],"ss:¿A qué hora llega el autobús?":["es-sen",70.737,2.733],"s:Necesito ayuda.":["es-sen",73.72,1.266],"ss:Necesito ayuda.":["es-sen",75.236,1.774],"s:Vamos a la playa el sábado.":["es-sen",77.259,1.747],"ss:Vamos a la playa el sábado.":["es-sen",79.257,2.488],"s:Mi cumpleaños es en marzo.":["es-sen",81.995,1.706],"ss:Mi cumpleaños es en marzo.":["es-sen",83.951,2.432],"s:Siempre tomo café en la mañana.":["es-sen",86.633,1.98],"ss:Siempre tomo café en la mañana.":["es-sen",88.863,2.829],"s:¿Me trae la cuenta, por favor?":["es-sen",91.942,1.99],"ss:¿Me trae la cuenta, por favor?":["es-sen",94.182,2.841],"s:El hospital está cerca de aquí.":["es-sen",97.274,1.894],"ss:El hospital está cerca de aquí.":["es-sen",99.417,2.699],"s:Hace mucho calor hoy.":["es-sen",102.367,1.331],"ss:Hace mucho calor hoy.":["es-sen",103.948,1.872],"s:Estoy aprendiendo español.":["es-sen",106.07,1.627],"ss:Estoy aprendiendo español.":["es-sen",107.947,2.302],"s:¿Qué hiciste el fin de semana?":["es-sen",110.499,1.901],"ss:¿Qué hiciste el fin de semana?":["es-sen",112.651,2.717],"s:Si llueve, nos quedamos en casa.":["es-sen",115.618,2.301],"ss:Si llueve, nos quedamos en casa.":["es-sen",118.169,3.301],"s:Gire a la derecha en la esquina.":["es-sen",121.719,1.754],"ss:Gire a la derecha en la esquina.":["es-sen",123.723,2.502],"s:Olvidé mi pasaporte.":["es-sen",126.475,1.473],"ss:Olvidé mi pasaporte.":["es-sen",128.198,2.075],"s:Es más fácil de lo que pensaba.":["es-sen",130.522,1.855],"ss:Es más fácil de lo que pensaba.":["es-sen",132.627,2.662]},"carrier":{}};
+
+// Generated by tools/make_audio.py — recorded clips (ja-JP-NanamiNeural): key -> [file, start s, length s]
+(window.MC_AUDIO_BY ||= {}).ja = {"clips":{"こんにちは|こんにちは":["ja-s1",0.0,0.882],"おはようございます|おはようございます":["ja-s1",1.132,1.389],"こんばんは|こんばんは":["ja-s1",2.771,0.865],"さようなら|さようなら":["ja-s1",3.886,0.967],"ありがとうございます|ありがとうございます":["ja-s1",5.103,1.408],"どういたしまして|どういたしまして":["ja-s1",6.761,1.361],"すみません|すみません":["ja-s1",8.372,0.909],"ごめんなさい|ごめんなさい":["ja-s1",9.532,0.979],"お願いします|おねがいします":["ja-s1",10.76,1.098],"はい|はい":["ja-s1",12.108,0.413],"いいえ|いいえ":["ja-s1",12.772,0.563],"はじめまして|はじめまして":["ja-s1",13.585,1.047],"よろしくお願いします|よろしくおねがいします":["ja-s1",14.882,1.625],"いただきます|いただきます":["ja-s1",16.757,1.018],"ごちそうさまでした|ごちそうさまでした":["ja-s1",18.025,1.438],"私|わたし":["ja-s1",19.713,0.779],"あなた|あなた":["ja-s1",20.743,0.65],"彼|かれ":["ja-s1",21.643,0.442],"彼女|かのじょ":["ja-s1",22.335,0.673],"これ|これ":["ja-s1",23.258,0.44],"それ|それ":["ja-s1",23.948,0.537],"あれ|あれ":["ja-s1",24.734,0.451],"ここ|ここ":["ja-s1",25.435,0.492],"そこ|そこ":["ja-s1",26.178,0.555],"あそこ|あそこ":["ja-s1",26.983,0.683],"どこ|どこ":["ja-s1",27.916,0.572],"何|なに":["ja-s1",28.738,0.555],"誰|だれ":["ja-s1",29.543,0.507],"いつ|いつ":["ja-s1",30.3,0.594],"どう|どう":["ja-s1",31.144,0.5],"いくら|いくら":["ja-s1",31.894,0.651],"一|いち":["ja-s1",32.795,0.603],"二|に":["ja-s1",33.647,0.365],"三|さん":["ja-s1",34.262,0.495],"四|よん":["ja-s1",35.007,0.446],"五|ご":["ja-s1",35.703,0.362],"六|ろく":["ja-s1",36.315,0.577],"七|なな":["ja-s1",37.142,0.528],"八|はち":["ja-s1",37.92,0.575],"九|きゅう":["ja-s1",38.746,0.459],"十|じゅう":["ja-s1",39.455,0.482],"百|ひゃく":["ja-s1",40.187,0.568],"千|せん":["ja-s1",41.004,0.537],"万|まん":["ja-s1",41.792,0.445],"円|えん":["ja-s1",42.486,0.442],"人|ひと":["ja-s1",43.178,0.476],"友達|ともだち":["ja-s1",43.904,0.842],"家族|かぞく":["ja-s1",44.996,0.744],"父|ちち":["ja-s1",45.99,0.607],"母|はは":["ja-s1",46.847,0.514],"お父さん|おとうさん":["ja-s1",47.611,0.863],"お母さん|おかあさん":["ja-s1",48.724,0.884],"兄|あに":["ja-s1",49.858,0.482],"姉|あね":["ja-s1",50.59,0.487],"弟|おとうと":["ja-s1",51.327,0.843],"妹|いもうと":["ja-s1",52.419,0.757],"子供|こども":["ja-s1",53.427,0.614],"先生|せんせい":["ja-s1",54.291,0.804],"学生|がくせい":["ja-s1",55.345,0.771],"今日|きょう":["ja-s1",56.366,0.531],"明日|あした":["ja-s1",57.147,0.667],"昨日|きのう":["ja-s1",58.065,0.658],"今|いま":["ja-s1",58.972,0.511],"朝|あさ":["ja-s1",59.733,0.531],"昼|ひる":["ja-s1",60.515,0.484],"夜|よる":["ja-s1",61.248,0.507],"時間|じかん":["ja-s1",62.006,0.631],"毎日|まいにち":["ja-s1",62.886,0.843],"月曜日|げつようび":["ja-s1",63.98,0.993],"火曜日|かようび":["ja-s1",65.223,0.771],"水曜日|すいようび":["ja-s1",66.243,0.987],"木曜日|もくようび":["ja-s1",67.48,0.969],"金曜日|きんようび":["ja-s1",68.699,0.911],"土曜日|どようび":["ja-s1",69.86,0.787],"日曜日|にちようび":["ja-s1",70.897,0.968],"水|みず":["ja-s1",72.115,0.56],"お茶|おちゃ":["ja-s1",72.924,0.564],"コーヒー|コーヒー":["ja-s1",73.738,0.79],"牛乳|ぎゅうにゅう":["ja-s1",74.778,0.787],"ご飯|ごはん":["ja-s1",75.814,0.653],"パン|パン":["ja-s1",76.717,0.464],"肉|にく":["ja-s1",77.431,0.559],"魚|さかな":["ja-s1",78.24,0.741],"野菜|やさい":["ja-s1",79.23,0.724],"果物|くだもの":["ja-s1",80.205,0.793],"卵|たまご":["ja-s1",81.248,0.654],"朝ご飯|あさごはん":["ja-s1",82.152,0.906],"昼ご飯|ひるごはん":["ja-s1",83.307,0.878],"晩ご飯|ばんごはん":["ja-s1",84.435,0.913],"家|いえ":["ja-s1",85.598,0.474],"学校|がっこう":["ja-s1",86.322,0.775],"会社|かいしゃ":["ja-s1",87.347,0.689],"駅|えき":["ja-s1",88.286,0.611],"店|みせ":["ja-s1",89.147,0.544],"トイレ|トイレ":["ja-s1",89.941,0.589],"病院|びょういん":["ja-s1",90.78,0.74],"銀行|ぎんこう":["ja-s1",91.77,0.827],"レストラン|レストラン":["ja-s1",92.848,0.879],"車|くるま":["ja-s1",93.977,0.63],"電車|でんしゃ":["ja-s1",94.857,0.717],"バス|バス":["ja-s1",95.824,0.551],"お金|おかね":["ja-s1",96.625,0.652],"電話|でんわ":["ja-s1",97.527,0.666],"本|ほん":["ja-s1",98.443,0.42],"机|つくえ":["ja-s1",99.113,0.701],"いす|いす":["ja-s1",100.064,0.532],"食べる|たべる":["ja-s1",100.846,0.625],"飲む|のむ":["ja-s1",101.72,0.493],"行く|いく":["ja-s1",102.463,0.529],"来る|くる":["ja-s1",103.242,0.446],"帰る|かえる":["ja-s1",103.937,0.628],"見る|みる":["ja-s1",104.815,0.483],"聞く|きく":["ja-s1",105.548,0.548],"話す|はなす":["ja-s1",106.347,0.731],"読む|よむ":["ja-s1",107.327,0.524],"書く|かく":["ja-s1",108.101,0.506],"買う|かう":["ja-s1",108.857,0.481],"する|する":["ja-s1",109.588,0.516],"ある|ある":["ja-s1",110.354,0.464],"いる|いる":["ja-s1",111.068,0.464],"分かる|わかる":["ja-s1",111.782,0.656],"寝る|ねる":["ja-s1",112.688,0.502],"起きる|おきる":["ja-s1",113.44,0.632],"働く|はたらく":["ja-s1",114.322,0.851],"勉強する|べんきょうする":["ja-s1",115.423,1.025],"好き|すき":["ja-s1",116.697,0.523],"嫌い|きらい":["ja-s1",117.47,0.642],"大きい|おおきい":["ja-s1",118.363,0.837],"小さい|ちいさい":["ja-s1",119.449,0.785],"いい|いい":["ja-s1",120.485,0.469],"悪い|わるい":["ja-s1",121.204,0.616],"新しい|あたらしい":["ja-s1",122.07,0.988],"古い|ふるい":["ja-s1",123.308,0.616],"高い|たかい":["ja-s1",124.174,0.612],"安い|やすい":["ja-s1",125.035,0.719],"暑い|あつい":["ja-s1",126.005,0.671],"寒い|さむい":["ja-s1",126.925,0.688],"おいしい|おいしい":["ja-s1",127.863,0.83],"楽しい|たのしい":["ja-s1",128.943,0.83],"元気|げんき":["ja-s1",130.023,0.721],"とても|とても":["ja-s1",130.993,0.669],"少し|すこし":["ja-s1",131.912,0.754],"たくさん|たくさん":["ja-s1",132.916,0.76],"そして|そして":["ja-s1",133.926,0.724],"でも|でも":["ja-s1",134.899,0.533],"時計|とけい":["ja-s2",0.0,0.604],"今年|ことし":["ja-s2",0.854,0.743],"去年|きょねん":["ja-s2",1.847,0.558],"来年|らいねん":["ja-s2",2.654,0.702],"今週|こんしゅう":["ja-s2",3.606,0.77],"来週|らいしゅう":["ja-s2",4.626,0.778],"先週|せんしゅう":["ja-s2",5.654,0.829],"今月|こんげつ":["ja-s2",6.734,0.782],"誕生日|たんじょうび":["ja-s2",7.765,0.917],"休み|やすみ":["ja-s2",8.932,0.706],"天気|てんき":["ja-s2",9.888,0.648],"雨|あめ":["ja-s2",10.786,0.485],"雪|ゆき":["ja-s2",11.521,0.566],"晴れ|はれ":["ja-s2",12.338,0.457],"風|かぜ":["ja-s2",13.044,0.54],"空|そら":["ja-s2",13.834,0.525],"山|やま":["ja-s2",14.609,0.553],"川|かわ":["ja-s2",15.412,0.505],"海|うみ":["ja-s2",16.167,0.463],"花|はな":["ja-s2",16.88,0.516],"木|き":["ja-s2",17.646,0.359],"犬|いぬ":["ja-s2",18.255,0.508],"猫|ねこ":["ja-s2",19.014,0.563],"鳥|とり":["ja-s2",19.826,0.452],"体|からだ":["ja-s2",20.528,0.633],"頭|あたま":["ja-s2",21.411,0.631],"目|め":["ja-s2",22.292,0.356],"耳|みみ":["ja-s2",22.898,0.513],"口|くち":["ja-s2",23.661,0.508],"手|て":["ja-s2",24.419,0.321],"足|あし":["ja-s2",24.99,0.563],"病気|びょうき":["ja-s2",25.803,0.701],"薬|くすり":["ja-s2",26.755,0.617],"医者|いしゃ":["ja-s2",27.622,0.562],"部屋|へや":["ja-s2",28.434,0.513],"台所|だいどころ":["ja-s2",29.197,0.884],"窓|まど":["ja-s2",30.33,0.525],"ドア|ドア":["ja-s2",31.106,0.525],"ベッド|ベッド":["ja-s2",31.88,0.667],"服|ふく":["ja-s2",32.797,0.521],"靴|くつ":["ja-s2",33.568,0.519],"帽子|ぼうし":["ja-s2",34.337,0.716],"かばん|かばん":["ja-s2",35.303,0.606],"傘|かさ":["ja-s2",36.159,0.543],"色|いろ":["ja-s2",36.952,0.466],"赤い|あかい":["ja-s2",37.668,0.61],"青い|あおい":["ja-s2",38.528,0.622],"白い|しろい":["ja-s2",39.4,0.655],"黒い|くろい":["ja-s2",40.304,0.611],"黄色い|きいろい":["ja-s2",41.165,0.73],"道|みち":["ja-s2",42.145,0.613],"右|みぎ":["ja-s2",43.008,0.555],"左|ひだり":["ja-s2",43.813,0.611],"前|まえ":["ja-s2",44.674,0.503],"後ろ|うしろ":["ja-s2",45.427,0.649],"上|うえ":["ja-s2",46.326,0.523],"下|した":["ja-s2",47.099,0.493],"中|なか":["ja-s2",47.843,0.568],"外|そと":["ja-s2",48.66,0.62],"隣|となり":["ja-s2",49.53,0.592],"近く|ちかく":["ja-s2",50.371,0.711],"遠い|とおい":["ja-s2",51.332,0.589],"近い|ちかい":["ja-s2",52.171,0.637],"空港|くうこう":["ja-s2",53.057,0.883],"飛行機|ひこうき":["ja-s2",54.19,0.827],"切符|きっぷ":["ja-s2",55.267,0.662],"地図|ちず":["ja-s2",56.18,0.574],"公園|こうえん":["ja-s2",57.003,0.723],"図書館|としょかん":["ja-s2",57.976,0.817],"映画|えいが":["ja-s2",59.043,0.604],"音楽|おんがく":["ja-s2",59.898,0.818],"写真|しゃしん":["ja-s2",60.965,0.7],"手紙|てがみ":["ja-s2",61.915,0.67],"名前|なまえ":["ja-s2",62.835,0.677],"言葉|ことば":["ja-s2",63.762,0.646],"日本語|にほんご":["ja-s2",64.658,0.82],"英語|えいご":["ja-s2",65.728,0.62],"日本|にほん":["ja-s2",66.598,0.631],"国|くに":["ja-s2",67.479,0.523],"町|まち":["ja-s2",68.252,0.608],"授業|じゅぎょう":["ja-s2",69.111,0.709],"宿題|しゅくだい":["ja-s2",70.069,0.759],"試験|しけん":["ja-s2",71.079,0.669],"質問|しつもん":["ja-s2",71.998,0.75],"仕事|しごと":["ja-s2",72.997,0.766],"会う|あう":["ja-s2",74.013,0.562],"待つ|まつ":["ja-s2",74.825,0.568],"持つ|もつ":["ja-s2",75.643,0.601],"使う|つかう":["ja-s2",76.494,0.635],"作る|つくる":["ja-s2",77.379,0.603],"開ける|あける":["ja-s2",78.232,0.614],"閉める|しめる":["ja-s2",79.095,0.675],"入る|はいる":["ja-s2",80.02,0.616],"出る|でる":["ja-s2",80.886,0.467],"着る|きる":["ja-s2",81.603,0.482],"脱ぐ|ぬぐ":["ja-s2",82.336,0.516],"歩く|あるく":["ja-s2",83.102,0.662],"走る|はしる":["ja-s2",84.014,0.657],"泳ぐ|およぐ":["ja-s2",84.92,0.67],"遊ぶ|あそぶ":["ja-s2",85.841,0.669],"歌う|うたう":["ja-s2",86.759,0.68],"休む|やすむ":["ja-s2",87.689,0.739],"始まる|はじまる":["ja-s2",88.678,0.76],"終わる|おわる":["ja-s2",89.688,0.612],"教える|おしえる":["ja-s2",90.55,0.796],"習う|ならう":["ja-s2",91.595,0.628],"知る|しる":["ja-s2",92.474,0.559],"思う|おもう":["ja-s2",93.283,0.613],"言う|いう":["ja-s2",94.146,0.518],"呼ぶ|よぶ":["ja-s2",94.914,0.523],"貸す|かす":["ja-s2",95.687,0.566],"借りる|かりる":["ja-s2",96.503,0.607],"返す|かえす":["ja-s2",97.359,0.744],"立つ|たつ":["ja-s2",98.353,0.555],"座る|すわる":["ja-s2",99.158,0.673],"洗う|あらう":["ja-s2",100.082,0.606],"長い|ながい":["ja-s2",100.938,0.7],"短い|みじかい":["ja-s2",101.888,0.802],"重い|おもい":["ja-s2",102.94,0.597],"軽い|かるい":["ja-s2",103.787,0.61],"早い|はやい":["ja-s2",104.648,0.629],"速い|はやい":["ja-s2",105.527,0.629],"遅い|おそい":["ja-s2",106.407,0.663],"忙しい|いそがしい":["ja-s2",107.32,0.963],"易しい|やさしい":["ja-s2",108.533,0.892],"難しい|むずかしい":["ja-s2",109.676,0.98],"広い|ひろい":["ja-s2",110.906,0.578],"狭い|せまい":["ja-s2",111.734,0.666],"明るい|あかるい":["ja-s2",112.65,0.733],"暗い|くらい":["ja-s2",113.633,0.587],"静か|しずか":["ja-s2",114.47,0.724],"有名|ゆうめい":["ja-s2",115.445,0.71],"大切|たいせつ":["ja-s2",116.404,0.822],"大丈夫|だいじょうぶ":["ja-s2",117.476,0.855],"上手|じょうず":["ja-s2",118.581,0.697],"下手|へた":["ja-s2",119.528,0.52],"いつも|いつも":["ja-s2",120.298,0.652],"時々|ときどき":["ja-s2",121.201,0.817],"よく|よく":["ja-s2",122.268,0.575],"まだ|まだ":["ja-s2",123.092,0.491],"もう|もう":["ja-s2",123.833,0.518],"一緒に|いっしょに":["ja-s2",124.601,0.747],"一人で|ひとりで":["ja-s2",125.598,0.772],"ゆっくり|ゆっくり":["ja-s2",126.62,0.791],"すぐ|すぐ":["ja-s2",127.661,0.562],"自転車|じてんしゃ":["ja-s3",0.0,0.849],"タクシー|タクシー":["ja-s3",1.099,0.815],"地下鉄|ちかてつ":["ja-s3",2.164,0.881],"建物|たてもの":["ja-s3",3.295,0.802],"ホテル|ホテル":["ja-s3",4.347,0.626],"大学|だいがく":["ja-s3",5.223,0.809],"教室|きょうしつ":["ja-s3",6.282,0.865],"新聞|しんぶん":["ja-s3",7.397,0.825],"雑誌|ざっし":["ja-s3",8.471,0.72],"辞書|じしょ":["ja-s3",9.442,0.597],"鉛筆|えんぴつ":["ja-s3",10.289,0.832],"紙|かみ":["ja-s3",11.371,0.511],"スマホ|スマホ":["ja-s3",12.132,0.723],"パソコン|パソコン":["ja-s3",13.105,0.755],"テレビ|テレビ":["ja-s3",14.111,0.617],"冷蔵庫|れいぞうこ":["ja-s3",14.977,0.918],"お風呂|おふろ":["ja-s3",16.145,0.622],"シャワー|シャワー":["ja-s3",17.018,0.758],"料理|りょうり":["ja-s3",18.025,0.617],"お菓子|おかし":["ja-s3",18.892,0.755],"お酒|おさけ":["ja-s3",19.896,0.687],"ビール|ビール":["ja-s3",20.833,0.682],"お弁当|おべんとう":["ja-s3",21.765,0.929],"箸|はし":["ja-s3",22.943,0.569],"皿|さら":["ja-s3",23.763,0.537],"コップ|コップ":["ja-s3",24.549,0.662],"砂糖|さとう":["ja-s3",25.461,0.726],"塩|しお":["ja-s3",26.438,0.574],"お腹|おなか":["ja-s3",27.261,0.647],"お腹がすく|おなかがすく":["ja-s3",28.158,1.077],"喉が渇く|のどがかわく":["ja-s3",29.485,1.208],"痛い|いたい":["ja-s3",30.943,0.634],"風邪|かぜ":["ja-s3",31.827,0.54],"熱|ねつ":["ja-s3",32.617,0.577],"旅行|りょこう":["ja-s3",33.444,0.707],"荷物|にもつ":["ja-s3",34.402,0.717],"お土産|おみやげ":["ja-s3",35.368,0.811],"プレゼント|プレゼント":["ja-s3",36.429,0.905],"約束|やくそく":["ja-s3",37.585,0.823],"意味|いみ":["ja-s3",38.658,0.478],"問題|もんだい":["ja-s3",39.386,0.678],"答え|こたえ":["ja-s3",40.314,0.667],"練習|れんしゅう":["ja-s3",41.232,0.779],"説明|せつめい":["ja-s3",42.26,0.822],"話|はなし":["ja-s3",43.332,0.722],"声|こえ":["ja-s3",44.304,0.486],"歌|うた":["ja-s3",45.041,0.507],"絵|え":["ja-s3",45.797,0.314],"趣味|しゅみ":["ja-s3",46.361,0.561],"スポーツ|スポーツ":["ja-s3",47.172,0.889],"サッカー|サッカー":["ja-s3",48.311,0.849],"ゲーム|ゲーム":["ja-s3",49.41,0.634],"世界|せかい":["ja-s3",50.294,0.718],"文化|ぶんか":["ja-s3",51.262,0.691],"季節|きせつ":["ja-s3",52.203,0.725],"春|はる":["ja-s3",53.178,0.456],"夏|なつ":["ja-s3",53.883,0.59],"秋|あき":["ja-s3",54.723,0.548],"冬|ふゆ":["ja-s3",55.521,0.504],"暖かい|あたたかい":["ja-s3",56.275,0.939],"涼しい|すずしい":["ja-s3",57.464,0.889],"冷たい|つめたい":["ja-s3",58.602,0.761],"曇り|くもり":["ja-s3",59.613,0.651],"降る|ふる":["ja-s3",60.514,0.449],"晴れる|はれる":["ja-s3",61.213,0.619],"覚える|おぼえる":["ja-s3",62.082,0.738],"忘れる|わすれる":["ja-s3",63.07,0.776],"答える|こたえる":["ja-s3",64.096,0.758],"困る|こまる":["ja-s3",65.104,0.573],"疲れる|つかれる":["ja-s3",65.926,0.734],"住む|すむ":["ja-s3",66.911,0.561],"売る|うる":["ja-s3",67.722,0.443],"払う|はらう":["ja-s3",68.415,0.598],"送る|おくる":["ja-s3",69.263,0.654],"もらう|もらう":["ja-s3",70.167,0.647],"あげる|あげる":["ja-s3",71.064,0.609],"くれる|くれる":["ja-s3",71.923,0.599],"乗る|のる":["ja-s3",72.773,0.484],"降りる|おりる":["ja-s3",73.507,0.586],"運転する|うんてんする":["ja-s3",74.343,1.03],"掃除する|そうじする":["ja-s3",75.623,0.949],"洗濯する|せんたくする":["ja-s3",76.822,1.076],"料理する|りょうりする":["ja-s3",78.148,0.915],"結婚する|けっこんする":["ja-s3",79.312,1.035],"電話する|でんわする":["ja-s3",80.598,0.899],"練習する|れんしゅうする":["ja-s3",81.746,1.078],"旅行する|りょこうする":["ja-s3",83.074,0.951],"散歩する|さんぽする":["ja-s3",84.276,0.985],"始める|はじめる":["ja-s3",85.511,0.774],"続ける|つづける":["ja-s3",86.535,0.787],"決める|きめる":["ja-s3",87.573,0.655],"選ぶ|えらぶ":["ja-s3",88.478,0.611],"探す|さがす":["ja-s3",89.338,0.787],"見つける|みつける":["ja-s3",90.376,0.751],"手伝う|てつだう":["ja-s3",91.377,0.757],"頑張る|がんばる":["ja-s3",92.384,0.743],"可愛い|かわいい":["ja-s3",93.377,0.79],"きれい|きれい":["ja-s3",94.417,0.554],"嬉しい|うれしい":["ja-s3",95.22,0.847],"悲しい|かなしい":["ja-s3",96.317,0.808],"怖い|こわい":["ja-s3",97.374,0.617],"面白い|おもしろい":["ja-s3",98.241,0.841],"つまらない|つまらない":["ja-s3",99.332,0.854],"優しい|やさしい":["ja-s3",100.436,0.892],"強い|つよい":["ja-s3",101.579,0.618],"弱い|よわい":["ja-s3",102.447,0.636],"若い|わかい":["ja-s3",103.332,0.653],"多い|おおい":["ja-s3",104.236,0.627],"少ない|すくない":["ja-s3",105.112,0.78],"同じ|おなじ":["ja-s3",106.142,0.642],"違う|ちがう":["ja-s3",107.034,0.697],"便利|べんり":["ja-s3",107.981,0.634],"簡単|かんたん":["ja-s3",108.866,0.748],"親切|しんせつ":["ja-s3",109.864,0.941],"暇|ひま":["ja-s3",111.055,0.502],"本当|ほんとう":["ja-s3",111.807,0.769],"全部|ぜんぶ":["ja-s3",112.826,0.662],"大体|だいたい":["ja-s3",113.738,0.718],"多分|たぶん":["ja-s3",114.706,0.585],"きっと|きっと":["ja-s3",115.541,0.679],"ちょっと|ちょっと":["ja-s3",116.47,0.635],"また|また":["ja-s3",117.355,0.556],"次|つぎ":["ja-s3",118.161,0.561],"最初|さいしょ":["ja-s3",118.972,0.75],"最後|さいご":["ja-s3",119.972,0.707],"後で|あとで":["ja-s3",120.929,0.655],"先に|さきに":["ja-s3",121.834,0.717],"から|から":["ja-s3",122.801,0.444],"まで|まで":["ja-s3",123.494,0.545],"だから|だから":["ja-s3",124.29,0.663],"それから|それから":["ja-s3",125.203,0.808],"s:はじめまして。":["ja-sen",0.0,0.994],"ss:はじめまして。":["ja-sen",1.244,1.388],"s:私はマリアです。":["ja-sen",2.882,1.427],"ss:私はマリアです。":["ja-sen",4.559,2.008],"s:お名前は何ですか。":["ja-sen",6.818,1.518],"ss:お名前は何ですか。":["ja-sen",8.586,2.134],"s:フィリピンから来ました。":["ja-sen",10.97,1.506],"ss:フィリピンから来ました。":["ja-sen",12.726,2.127],"s:よろしくお願いします。":["ja-sen",15.104,1.559],"ss:よろしくお願いします。":["ja-sen",16.913,2.184],"s:これは何ですか。":["ja-sen",19.347,1.305],"ss:これは何ですか。":["ja-sen",20.901,1.817],"s:いくらですか。":["ja-sen",22.968,1.099],"ss:いくらですか。":["ja-sen",24.318,1.52],"s:水をください。":["ja-sen",26.088,1.134],"ss:水をください。":["ja-sen",27.471,1.562],"s:トイレはどこですか。":["ja-sen",29.284,1.438],"ss:トイレはどこですか。":["ja-sen",30.972,2.03],"s:日本語が少し分かります。":["ja-sen",33.252,1.935],"ss:日本語が少し分かります。":["ja-sen",35.437,2.749],"s:今日は暑いですね。":["ja-sen",38.437,1.444],"ss:今日は暑いですね。":["ja-sen",40.131,2.051],"s:コーヒーが好きです。":["ja-sen",42.432,1.354],"ss:コーヒーが好きです。":["ja-sen",44.036,1.909],"s:毎日日本語を勉強します。":["ja-sen",46.195,2.296],"ss:毎日日本語を勉強します。":["ja-sen",48.74,3.27],"s:もう一度お願いします。":["ja-sen",52.26,1.682],"ss:もう一度お願いします。":["ja-sen",54.192,2.384],"s:分かりません。":["ja-sen",56.826,0.958],"ss:分かりません。":["ja-sen",58.034,1.324],"s:駅はどこですか。":["ja-sen",59.608,1.357],"ss:駅はどこですか。":["ja-sen",61.215,1.923],"s:右に曲がってください。":["ja-sen",63.387,1.582],"ss:右に曲がってください。":["ja-sen",65.22,2.228],"s:週末は何をしますか。":["ja-sen",67.698,1.943],"ss:週末は何をしますか。":["ja-sen",69.891,2.767],"s:一緒に行きましょう。":["ja-sen",72.908,1.37],"ss:一緒に行きましょう。":["ja-sen",74.528,1.939],"s:雨が降っています。":["ja-sen",76.716,1.347],"ss:雨が降っています。":["ja-sen",78.313,1.878],"s:このかばんは高いです。":["ja-sen",80.441,1.721],"ss:このかばんは高いです。":["ja-sen",82.412,2.425],"s:ちょっと待ってください。":["ja-sen",85.087,1.433],"ss:ちょっと待ってください。":["ja-sen",86.77,2.004],"s:日本へ旅行したいです。":["ja-sen",89.024,1.792],"ss:日本へ旅行したいです。":["ja-sen",91.066,2.534],"s:宿題を忘れました。":["ja-sen",93.85,1.601],"ss:宿題を忘れました。":["ja-sen",95.701,2.266],"s:お腹がすきました。":["ja-sen",98.217,1.328],"ss:お腹がすきました。":["ja-sen",99.795,1.868],"s:頭が痛いです。":["ja-sen",101.913,1.376],"ss:頭が痛いです。":["ja-sen",103.539,1.947],"s:日本語は難しいですが、面白いです。":["ja-sen",105.737,3.058],"ss:日本語は難しいですが、面白いです。":["ja-sen",109.044,4.401],"s:明日は晴れるでしょう。":["ja-sen",113.696,1.519],"ss:明日は晴れるでしょう。":["ja-sen",115.465,2.149],"s:頑張ってください。":["ja-sen",117.864,1.244],"ss:頑張ってください。":["ja-sen",119.358,1.739],"k:あ":["ja-kana",0.0,0.324],"k:い":["ja-kana",0.574,0.445],"k:う":["ja-kana",1.269,0.309],"k:え":["ja-kana",1.827,0.322],"k:お":["ja-kana",2.4,0.305],"k:か":["ja-kana",2.954,0.354],"k:き":["ja-kana",3.558,0.376],"k:く":["ja-kana",4.184,0.347],"k:け":["ja-kana",4.781,0.367],"k:こ":["ja-kana",5.398,0.321],"k:さ":["ja-kana",5.969,0.443],"k:し":["ja-kana",6.662,0.446],"k:す":["ja-kana",7.357,0.457],"k:せ":["ja-kana",8.064,0.473],"k:そ":["ja-kana",8.787,0.445],"k:た":["ja-kana",9.482,0.309],"k:ち":["ja-kana",10.04,0.403],"k:つ":["ja-kana",10.693,0.397],"k:て":["ja-kana",11.34,0.33],"k:と":["ja-kana",11.92,0.326],"k:な":["ja-kana",12.496,0.396],"k:に":["ja-kana",13.142,0.369],"k:ぬ":["ja-kana",13.761,0.399],"k:ね":["ja-kana",14.41,0.409],"k:の":["ja-kana",15.069,0.374],"k:は":["ja-kana",15.693,0.41],"k:ひ":["ja-kana",16.353,0.375],"k:ふ":["ja-kana",16.978,0.394],"k:へ":["ja-kana",17.623,0.343],"k:ほ":["ja-kana",18.216,0.334],"k:ま":["ja-kana",18.8,0.4],"k:み":["ja-kana",19.45,0.362],"k:む":["ja-kana",20.062,0.335],"k:め":["ja-kana",20.648,0.364],"k:も":["ja-kana",21.262,0.365],"k:や":["ja-kana",21.877,0.37],"k:ゆ":["ja-kana",22.497,0.375],"k:よ":["ja-kana",23.122,0.379],"k:ら":["ja-kana",23.752,0.352],"k:り":["ja-kana",24.353,0.379],"k:る":["ja-kana",24.982,0.348],"k:れ":["ja-kana",25.58,0.381],"k:ろ":["ja-kana",26.21,0.362],"k:わ":["ja-kana",26.823,0.367],"k:を":["ja-kana",27.44,0.305],"k:ん":["ja-kana",27.995,0.391],"k:が":["ja-kana",28.636,0.341],"k:ぎ":["ja-kana",29.227,0.382],"k:ぐ":["ja-kana",29.859,0.385],"k:げ":["ja-kana",30.494,0.384],"k:ご":["ja-kana",31.128,0.378],"k:ざ":["ja-kana",31.756,0.413],"k:じ":["ja-kana",32.419,0.384],"k:ず":["ja-kana",33.053,0.414],"k:ぜ":["ja-kana",33.717,0.443],"k:ぞ":["ja-kana",34.41,0.39],"k:だ":["ja-kana",35.05,0.324],"k:ぢ":["ja-kana",35.624,0.384],"k:づ":["ja-kana",36.258,0.414],"k:で":["ja-kana",36.922,0.366],"k:ど":["ja-kana",37.538,0.355],"k:ば":["ja-kana",38.143,0.328],"k:び":["ja-kana",38.721,0.341],"k:ぶ":["ja-kana",39.312,0.345],"k:べ":["ja-kana",39.907,0.358],"k:ぼ":["ja-kana",40.514,0.328],"k:ぱ":["ja-kana",41.092,0.339],"k:ぴ":["ja-kana",41.681,0.336],"k:ぷ":["ja-kana",42.267,0.317],"k:ぺ":["ja-kana",42.834,0.325],"k:ぽ":["ja-kana",43.409,0.319],"k:きゃ":["ja-kana",43.978,0.329],"k:きゅ":["ja-kana",44.557,0.352],"k:きょ":["ja-kana",45.159,0.359],"k:しゃ":["ja-kana",45.768,0.43],"k:しゅ":["ja-kana",46.448,0.414],"k:しょ":["ja-kana",47.112,0.443],"k:ちゃ":["ja-kana",47.805,0.338],"k:ちゅ":["ja-kana",48.393,0.409],"k:ちょ":["ja-kana",49.052,0.383],"k:にゃ":["ja-kana",49.685,0.415],"k:にゅ":["ja-kana",50.35,0.402],"k:にょ":["ja-kana",51.002,0.421],"k:ひゃ":["ja-kana",51.673,0.369],"k:ひゅ":["ja-kana",52.291,0.378],"k:ひょ":["ja-kana",52.919,0.415],"k:みゃ":["ja-kana",53.584,0.391],"k:みゅ":["ja-kana",54.225,0.369],"k:みょ":["ja-kana",54.844,0.405],"k:りゃ":["ja-kana",55.499,0.401],"k:りゅ":["ja-kana",56.15,0.377],"k:りょ":["ja-kana",56.777,0.412],"k:ぎゃ":["ja-kana",57.439,0.359],"k:ぎゅ":["ja-kana",58.048,0.416],"k:ぎょ":["ja-kana",58.714,0.415],"k:じゃ":["ja-kana",59.379,0.432],"k:じゅ":["ja-kana",60.061,0.407],"k:じょ":["ja-kana",60.718,0.402],"k:びゃ":["ja-kana",61.37,0.389],"k:びゅ":["ja-kana",62.009,0.405],"k:びょ":["ja-kana",62.664,0.398],"k:ぴゃ":["ja-kana",63.311,0.345],"k:ぴゅ":["ja-kana",63.906,0.363],"k:ぴょ":["ja-kana",64.519,0.354],"kj:一":["ja-kanji",0.0,1.282],"kj:二":["ja-kanji",1.532,1.161],"kj:三":["ja-kanji",2.943,1.217],"kj:四":["ja-kanji",4.41,0.984],"kj:五":["ja-kanji",5.644,1.189],"kj:六":["ja-kanji",7.083,1.359],"kj:七":["ja-kanji",8.693,1.33],"kj:八":["ja-kanji",10.273,1.241],"kj:九":["ja-kanji",11.764,1.536],"kj:十":["ja-kanji",13.55,1.047],"kj:百":["ja-kanji",14.848,0.576],"kj:千":["ja-kanji",15.674,0.537],"kj:万":["ja-kanji",16.461,0.434],"kj:円":["ja-kanji",17.145,1.216],"kj:日":["ja-kanji",18.611,0.996],"kj:月":["ja-kanji",19.857,1.301],"kj:火":["ja-kanji",21.409,0.752],"kj:水":["ja-kanji",22.411,1.015],"kj:木":["ja-kanji",23.676,0.998],"kj:金":["ja-kanji",24.924,1.176],"kj:土":["ja-kanji",26.351,1.132],"kj:年":["ja-kanji",27.733,1.141],"kj:時":["ja-kanji",29.123,1.008],"kj:分":["ja-kanji",30.381,1.167],"kj:半":["ja-kanji",31.798,1.192],"kj:今":["ja-kanji",33.24,0.915],"kj:何":["ja-kanji",34.404,0.882],"kj:週":["ja-kanji",35.536,0.536],"kj:毎":["ja-kanji",36.323,0.497],"kj:午":["ja-kanji",37.07,0.362],"kj:前":["ja-kanji",37.682,1.02],"kj:後":["ja-kanji",38.952,1.19],"kj:人":["ja-kanji",40.391,1.134],"kj:男":["ja-kanji",41.775,1.324],"kj:女":["ja-kanji",43.349,1.146],"kj:子":["ja-kanji",44.745,1.031],"kj:父":["ja-kanji",46.026,0.98],"kj:母":["ja-kanji",47.256,1.013],"kj:友":["ja-kanji",48.519,1.081],"kj:先":["ja-kanji",49.85,1.19],"kj:生":["ja-kanji",51.29,1.274],"kj:学":["ja-kanji",52.814,1.296],"kj:校":["ja-kanji",54.359,0.433],"kj:語":["ja-kanji",55.043,1.167],"kj:本":["ja-kanji",56.46,1.077],"kj:名":["ja-kanji",57.787,0.929],"kj:山":["ja-kanji",58.966,1.169],"kj:川":["ja-kanji",60.385,1.218],"kj:天":["ja-kanji",61.853,0.912],"kj:気":["ja-kanji",63.015,0.359],"kj:雨":["ja-kanji",63.624,0.871],"kj:花":["ja-kanji",64.745,1.018],"kj:上":["ja-kanji",66.012,1.145],"kj:下":["ja-kanji",67.407,0.864],"kj:中":["ja-kanji",68.521,1.169],"kj:外":["ja-kanji",69.94,1.16],"kj:右":["ja-kanji",71.35,0.869],"kj:左":["ja-kanji",72.468,1.04],"kj:大":["ja-kanji",73.759,1.435],"kj:小":["ja-kanji",75.444,1.53],"kj:長":["ja-kanji",77.223,1.401],"kj:高":["ja-kanji",78.875,1.19],"kj:安":["ja-kanji",80.314,1.397],"kj:新":["ja-kanji",81.961,1.423],"kj:古":["ja-kanji",83.634,1.093],"kj:白":["ja-kanji",84.977,1.007],"kj:多":["ja-kanji",86.233,0.805],"kj:少":["ja-kanji",87.289,1.332],"kj:国":["ja-kanji",88.87,1.263],"kj:食":["ja-kanji",90.383,1.282],"kj:飲":["ja-kanji",91.915,0.905],"kj:見":["ja-kanji",93.07,0.744],"kj:聞":["ja-kanji",94.064,1.095],"kj:読":["ja-kanji",95.409,0.997],"kj:書":["ja-kanji",96.656,1.172],"kj:話":["ja-kanji",98.078,1.152],"kj:言":["ja-kanji",99.48,1.056],"kj:行":["ja-kanji",100.786,1.12],"kj:来":["ja-kanji",102.156,1.017],"kj:出":["ja-kanji",103.423,1.099],"kj:入":["ja-kanji",104.772,1.232],"kj:休":["ja-kanji",106.254,1.208],"kj:買":["ja-kanji",107.713,0.996],"kj:立":["ja-kanji",108.959,1.271],"kj:会":["ja-kanji",110.48,1.064],"kj:電":["ja-kanji",111.794,0.452],"kj:車":["ja-kanji",112.496,1.17],"kj:駅":["ja-kanji",113.916,0.611],"kj:店":["ja-kanji",114.777,0.873],"kj:道":["ja-kanji",115.9,1.193],"kj:東":["ja-kanji",117.343,1.318],"kj:西":["ja-kanji",118.911,1.281],"kj:南":["ja-kanji",120.442,1.057],"kj:北":["ja-kanji",121.749,1.188],"kj:口":["ja-kanji",123.187,0.996],"kj:目":["ja-kanji",124.433,0.919],"kj:耳":["ja-kanji",125.602,0.781],"kj:手":["ja-kanji",126.633,0.944],"kj:足":["ja-kanji",127.827,1.222]},"carrier":{}};
 
 // Where shared progress goes: the Supabase project (org "Mandarin Coach", project mandarin-coach, Singapore)
 // and its publishable key. The key is public by design; the database only allows the mc_* functions (supabase/setup.sql).
@@ -995,6 +2217,9 @@ window.MC_CLOUD = { url: "https://ezajyxxogkucvketqstl.supabase.co", key: "sb_pu
 </script>
 <script>
 "use strict";
+// The page runs one course at a time (see courses.js): bind its words, sentences, links and recordings.
+window.MC_DATA = MC_COURSES[CUR];
+window.MC_AUDIO = (window.MC_AUDIO_BY || {})[CUR];
 // ---------- small DOM helpers ----------
 const $ = (sel, root = document) => root.querySelector(sel);
 function el(tag, attrs, ...kids) {
@@ -1044,12 +2269,16 @@ function numToMarks(input) {
 
 // Coloured pinyin: one span per syllable, punctuation kept.
 function pinyinEl(py, cls = "pinyin") {
+  // Japanese shows the kana reading and its romaji; Spanish needs no reading line.
+  if (CUR === "ja") return el("span", { class: cls + " reading" }, el("span", { lang: "ja" }, py), el("span", { class: "romaji" }, kanaToRomaji(py.replace(/\s+/g, ""))));
+  if (CUR !== "zh") return el("span", { class: cls });
   const wrap = el("span", { class: cls, lang: "zh-Latn-pinyin" });
   sylls(py).forEach((s, i) => { if (i) wrap.append(" "); wrap.append(el("span", { class: "t" + toneOf(s) }, s)); });
   return wrap;
 }
 // Coloured hanzi: maps each character to its syllable (erhua 儿 shares the syllable before it).
 function hanziEl(hz, py, cls = "han") {
+  if (CUR !== "zh") return el("span", { class: cls, lang: COURSE.lang }, hz);
   const wrap = el("span", { class: cls, lang: "zh-CN" });
   const ss = sylls(py).map(letters).filter(Boolean);
   const isHan = (c) => /\p{Script=Han}/u.test(c);
@@ -1083,7 +2312,7 @@ for (const stage of [1, 2, 3]) {
 }
 function addCustomWords(list) { for (const c of list || []) addWord({ id: "c:" + c.hz + "|" + c.py.replace(/\s/g, ""), hz: c.hz, py: c.py, en: c.en, stage: 0, custom: true }); }
 
-// ---------- sound: recorded clips first (work everywhere), the browser's own Mandarin voice as a fallback ----------
+// ---------- sound: recorded clips first (work everywhere), the browser's own voice as a fallback ----------
 const Voice = {
   voice: null, checked: false, ctx: null, files: {}, urls: {}, els: {}, cur: null, curEl: null, elTimer: 0, token: 0, utter: null,
   hasClips: () => !!(window.MC_AUDIO && MC_AUDIO.clips),
@@ -1098,7 +2327,7 @@ const Voice = {
       .then((b) => new Promise((ok, no) => this.audioCtx().decodeAudioData(b, ok, no)))
       .catch((e) => { delete this.files[file]; throw e; }));
   },
-  preload(stage) { if (this.hasClips() && this.audioCtx()) this.load("s" + stage).catch(() => {}); },
+  preload(stage) { if (this.hasClips() && this.audioCtx()) this.load((CUR === "zh" ? "" : CUR + "-") + "s" + stage).catch(() => {}); },
   speed() { try { return +Store.state.settings.speed || 1; } catch { return 1; } },
   url(file) {
     return (this.urls[file] ||= fetch("audio/" + file + ".mp3")
@@ -1147,10 +2376,11 @@ const Voice = {
     const choose = () => {
       const vs = speechSynthesis.getVoices();
       if (!vs.length) return;
-      const zh = vs.filter((v) => /^zh[-_](CN|Hans)/i.test(v.lang) || /^cmn/i.test(v.lang));
-      const tw = vs.filter((v) => /^zh[-_]TW/i.test(v.lang));
-      const score = (v) => (/natural|neural|online/i.test(v.name) ? 4 : 0) + (/xiaoxiao|xiaoyi|yunxi|google/i.test(v.name) ? 2 : 0) + (v.localService ? 0 : 1);
-      this.voice = zh.sort((a, b) => score(b) - score(a))[0] || tw[0] || null;
+      // Best match for this course's language first, then any voice of the same language.
+      const best = { zh: /^zh[-_](CN|Hans)|^cmn/i, es: /^es[-_](MX|US|419)/i, ja: /^ja/i }[CUR];
+      const near = { zh: /^zh[-_]TW/i, es: /^es/i, ja: /^ja/i }[CUR];
+      const score = (v) => (/natural|neural|online/i.test(v.name) ? 4 : 0) + (/xiaoxiao|xiaoyi|yunxi|dalia|nanami|google/i.test(v.name) ? 2 : 0) + (v.localService ? 0 : 1);
+      this.voice = vs.filter((v) => best.test(v.lang)).sort((a, b) => score(b) - score(a))[0] || vs.find((v) => near.test(v.lang)) || null;
       this.checked = true;
       document.dispatchEvent(new Event("mc:voices"));
     };
@@ -1162,7 +2392,7 @@ const Voice = {
     if (!("speechSynthesis" in window) || !text) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "zh-CN"; u.rate = Math.min(2, rate * this.speed());
+    u.lang = COURSE.lang; u.rate = Math.min(2, rate * this.speed());
     if (this.voice) u.voice = this.voice;
     this.utter = u;                                     // Chrome drops utterances nothing refers to
     setTimeout(() => speechSynthesis.speak(u), 60);     // speaking right after cancel() is sometimes dropped
@@ -1197,9 +2427,26 @@ function speedControl(target) {
   }
   return group;
 }
+// The reading line under a sentence: pinyin, or kana with its romaji. Spanish needs none.
+function sentenceReading(s, cls) {
+  if (CUR === "zh") return pinyinEl(s[2], cls);
+  if (CUR === "ja") return el("span", { class: cls + " reading" }, el("span", { lang: "ja" }, s[2]), el("span", { class: "romaji" }, s[4] || ""));
+  return null;
+}
+// A word's reading line. A Japanese word written only in kana already shows its reading, so it gets just the romaji.
+function readingEl(w, cls = "pinyin") {
+  if (CUR === "ja" && w.py === w.hz) return el("span", { class: cls + " reading" }, el("span", { class: "romaji" }, kanaToRomaji(w.py)));
+  return pinyinEl(w.py, cls);
+}
 
 // ---------- saved progress: kept in this browser; a progress file moves it between devices ----------
-const LOCAL_KEY = "mandarin-coach-v1";
+const LOCAL_KEY = COURSE.storeKey;
+// Class membership belongs to the person, not to one course, so it lives in its own key.
+const SHARE_KEY = "language-coach-share";
+const Share = {
+  get() { try { return JSON.parse(localStorage.getItem(SHARE_KEY) || "null"); } catch { return null; } },
+  set(v) { try { v ? localStorage.setItem(SHARE_KEY, JSON.stringify(v)) : localStorage.removeItem(SHARE_KEY); } catch {} },
+};
 const blankState = () => ({
   v: 1, updatedAt: 0,
   cards: {},          // wordId -> { due, ivl, ease, reps, lapses, intro, last }
@@ -1216,6 +2463,9 @@ const Store = {
   init() {
     const s = this.read();
     if (s) this.adopt(s);
+    if (!Share.get()) {   // earlier versions kept the class inside the Mandarin progress
+      try { const zh = JSON.parse(localStorage.getItem(COURSE_META.zh.storeKey) || "null"); if (zh && zh.share) Share.set(zh.share); } catch {}
+    }
     try { localStorage.setItem(LOCAL_KEY + "-probe", "1"); localStorage.removeItem(LOCAL_KEY + "-probe"); }
     catch { status("This browser can't save progress. Is it a private window?"); }
   },
@@ -1227,14 +2477,15 @@ const Store = {
   // Download everything as a file, to copy to another device or keep as a backup.
   exportFile() {
     const d = dayDate(dayNum()), stamp = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-    const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(this.state)], { type: "application/json" })), download: "mandarin-coach-progress-" + stamp + ".json" });
+    const a = el("a", { href: URL.createObjectURL(new Blob([JSON.stringify(Object.assign({ course: CUR, share: Share.get() }, this.state))], { type: "application/json" })), download: "language-coach-" + COURSE.name.toLowerCase() + "-" + stamp + ".json" });
     document.body.append(a); a.click(); a.remove();
   },
   // Merge a progress file into this device: nothing already here is lost, the newer copy of each card wins.
   importText(text) {
     let o;
-    try { o = JSON.parse(text); } catch { throw new Error("That file isn't a Mandarin Coach progress file."); }
-    if (!o || !o.v || typeof o.cards !== "object") throw new Error("That file isn't a Mandarin Coach progress file.");
+    try { o = JSON.parse(text); } catch { throw new Error("That file isn't a Language Coach progress file."); }
+    if (!o || !o.v || typeof o.cards !== "object") throw new Error("That file isn't a Language Coach progress file.");
+    if ((o.course || "zh") !== CUR) throw new Error("That file is " + COURSE_META[o.course || "zh"].name + " progress. Switch to " + COURSE_META[o.course || "zh"].name + " at the top, then load it.");
     const S = this.state;
     let cards = 0;
     for (const [id, c] of Object.entries(o.cards)) {
@@ -1248,7 +2499,7 @@ const Store = {
     for (const c of o.custom || []) if (!have.has(c.hz + "|" + c.py)) S.custom.push(c);
     addCustomWords(S.custom);
     for (const [k, v] of Object.entries(o.toneStats || {})) if (!S.toneStats[k] || v.n > S.toneStats[k].n) S.toneStats[k] = v;
-    if (o.share && !S.share) S.share = o.share;     // keep sharing with the same class from this device too
+    if (o.share && !Share.get()) Share.set(o.share);   // keep sharing with the same class from this device too
     this.save();
     return cards;
   },
@@ -1306,6 +2557,11 @@ const currentStage = () => { const n = learned().filter((w) => !w.custom).length
 
 // ---------- flashcards ----------
 function wordFace(w, size) {
+  // Spanish words are written in letters, so they get a plain card instead of the character practice grid.
+  if (CUR === "es") {
+    const n = w.hz.length, fs = n <= 6 ? 3 : n <= 11 ? 2.4 : 1.9;
+    return el("div", { class: "tzg plain" }, el("span", { class: "word", lang: COURSE.lang, style: "font-size:" + fs + "rem" }, w.hz));
+  }
   const n = [...w.hz].length;
   const fs = size || (n === 1 ? 128 : n === 2 ? 92 : n === 3 ? 64 : 46);
   const box = el("div", { class: "tzg" }, hanziEl(w.hz, w.py, "word"));
@@ -1380,7 +2636,7 @@ function mountCards(root, mode, onDone) {
       el("button", { class: "btn " + g.key, type: "button", onclick: () => grade(i) }, g.label, el("small", {}, ivlLabel(nextInterval(c, i))))));
     stage.replaceChildren(
       wordFace(w),
-      el("div", { class: "answer" }, pinyinEl(w.py), el("p", { class: "meaning" }, w.en), w.stage ? null : el("span", { class: "chip" }, "Your word"),
+      el("div", { class: "answer" }, readingEl(w), el("p", { class: "meaning" }, w.en), w.stage ? null : el("span", { class: "chip" }, "Your word"),
         heard ? el("p", { class: "muted small" }, "Heard in: ", hanziEl(heard[0], heard[1]), " " + heard[1]) : null,
         c ? null : el("p", { class: "muted small" }, "New word: listen, say it out loud, then rate how well you know it")),
       nav("Play again"),
@@ -1431,41 +2687,43 @@ function renderWords(root) {
     list.replaceChildren(...rows.slice(0, 400).map((w) => {
       const c = S.cards[w.id];
       const chip = !c ? el("span", { class: "chip" }, "new") : c.ivl >= 21 ? el("span", { class: "chip good" }, "known") : el("span", { class: "chip warn" }, "learning");
-      return el("div", { class: "wl-row", role: "listitem" }, hanziEl(w.hz, w.py), pinyinEl(w.py, "wl-py"), el("span", { class: "wl-mean" }, w.en), el("div", { class: "row" }, chip, speakBtn(w)));
+      return el("div", { class: "wl-row", role: "listitem" }, hanziEl(w.hz, w.py), readingEl(w, "wl-py"), el("span", { class: "wl-mean" }, w.en), el("div", { class: "row" }, chip, speakBtn(w)));
     }));
     if (!rows.length) list.append(el("p", { class: "muted", style: "padding:12px" }, "No words match."));
   }
   search.addEventListener("input", draw);
   filter.addEventListener("change", draw);
 
-  const hz = el("input", { type: "text", id: "add-hz", placeholder: "汉字", lang: "zh-CN" });
-  const py = el("input", { type: "text", id: "add-py", placeholder: "ni3 hao3 or nǐ hǎo" });
+  const hz = el("input", { type: "text", id: "add-hz", placeholder: { zh: "汉字", ja: "学校", es: "la palabra" }[CUR], lang: COURSE.lang });
+  const py = el("input", { type: "text", id: "add-py", placeholder: COURSE.readingHint });
   const en = el("input", { type: "text", id: "add-en", placeholder: "Meaning in English" });
   const msg = el("p", { class: "small muted", role: "status" });
   const add = el("form", { class: "grid2", onsubmit: (e) => {
     e.preventDefault();
-    const w = { hz: hz.value.trim(), py: numToMarks(py.value), en: en.value.trim(), added: dayNum() };
-    if (!w.hz || !w.py || !w.en) { msg.textContent = "Fill in all three boxes."; return; }
-    if (![...w.hz].some((c) => /\p{Script=Han}/u.test(c))) { msg.textContent = "The first box needs Chinese characters."; return; }
+    const w = { hz: hz.value.trim(), py: CUR === "zh" ? numToMarks(py.value) : py.value.trim(), en: en.value.trim(), added: dayNum() };
+    if (!w.hz || !w.en || (COURSE.readingLabel && !w.py)) { msg.textContent = COURSE.readingLabel ? "Fill in all three boxes." : "Fill in both boxes."; return; }
+    if (CUR === "zh" && ![...w.hz].some((c) => /\p{Script=Han}/u.test(c))) { msg.textContent = "The first box needs Chinese characters."; return; }
+    if (CUR === "ja" && /[^぀-ヿ\s]/.test(w.py)) { msg.textContent = "Write the reading in hiragana or katakana."; return; }
     S.custom.push(w); addCustomWords([w]); Store.save();
-    msg.textContent = "Added " + w.hz + " (" + w.py + "). It comes first in your next new words.";
+    msg.textContent = "Added " + w.hz + (w.py ? " (" + w.py + ")" : "") + ". It comes first in your next new words.";
     hz.value = py.value = en.value = ""; draw();
   } },
-    el("label", { class: "field" }, el("span", { class: "label" }, "Characters"), hz),
-    el("label", { class: "field" }, el("span", { class: "label" }, "Pinyin"), py),
+    el("label", { class: "field" }, el("span", { class: "label" }, CUR === "es" ? "Spanish" : CUR === "ja" ? "Word" : "Characters"), hz),
+    COURSE.readingLabel ? el("label", { class: "field" }, el("span", { class: "label" }, COURSE.readingLabel), py) : null,
     el("label", { class: "field" }, el("span", { class: "label" }, "Meaning"), en),
     el("div", { class: "field", style: "align-content:end" }, el("button", { class: "btn primary", type: "submit" }, "Add word")));
 
   root.append(
     el("div", { class: "panel" },
       el("h2", {}, "Words"),
-      el("p", { class: "muted" }, WORDS.length + " words: stages 1 to 3 follow the classic HSK 1–3 lists, in the order you learn them."),
-      el("div", { class: "legend" }, el("span", { class: "t1" }, "1st tone ā"), el("span", { class: "t2" }, "2nd á"), el("span", { class: "t3" }, "3rd ǎ"), el("span", { class: "t4" }, "4th à"), el("span", { class: "t5" }, "neutral a")),
+      el("p", { class: "muted" }, WORDS.length + " words: " + COURSE.stageNote + ", in the order you learn them."),
+      CUR === "zh" ? el("div", { class: "legend" }, el("span", { class: "t1" }, "1st tone ā"), el("span", { class: "t2" }, "2nd á"), el("span", { class: "t3" }, "3rd ǎ"), el("span", { class: "t4" }, "4th à"), el("span", { class: "t5" }, "neutral a")) : null,
       el("div", { class: "row" }, el("div", { style: "flex:2 1 220px" }, search), el("div", { style: "flex:1 1 160px" }, filter)),
       list),
     el("div", { class: "panel" },
       el("h3", {}, "Add a word from your lesson"),
-      el("p", { class: "muted small" }, "Type pinyin with tone numbers (ni3 hao3, lv4 for lǜ) or with marks. Your words go to the front of the new-words queue. They play with your browser's own Mandarin voice, which Chrome and Edge have."),
+      el("p", { class: "muted small" }, { zh: "Type pinyin with tone numbers (ni3 hao3, lv4 for lǜ) or with marks. ", ja: "Type the reading in hiragana or katakana. ", es: "Add the article to nouns (el libro, la mesa). " }[CUR] +
+        "Your words go to the front of the new-words queue. They play with your browser's own " + COURSE.name + " voice, which Chrome and Edge have."),
       add, msg));
   draw();
 }
@@ -1579,13 +2837,153 @@ function renderShadowing(root, limit) {
   root.append(el("div", { class: "panel-head" }, el("h3", {}, "Shadowing")),
     el("p", { class: "muted small" }, "Play a sentence, then repeat it out loud copying the melody. Do each one three times. Slow plays a separate slow recording."));
   const list = el("div", { class: "sentences" });
-  for (const [s, hz, py, en] of items) {
+  for (const row of items) {
+    const [s, hz, , en] = row;
     list.append(el("div", { class: "sentence" },
-      el("div", { class: "sentence-top" }, el("span", { class: "han sentence-hz", lang: "zh-CN" }, hz),
+      el("div", { class: "sentence-top" }, el("span", { class: "han sentence-hz", lang: COURSE.lang }, hz),
         el("div", { class: "sentence-btns" }, speakBtn(hz, "Play"), el("button", { class: "btn small ghost", type: "button", onclick: () => Voice.say(hz, 0.55) }, "Slow"))),
-      pinyinEl(py, "sentence-py"), el("span", { class: "muted small" }, en + (s > stage ? " · next stage" : ""))));
+      sentenceReading(row, "sentence-py"), el("span", { class: "muted small" }, en + (s > stage ? " · next stage" : ""))));
   }
   root.append(list);
+}
+
+// ---------- Japanese script: romaji, kana charts, kana and kanji quizzes ----------
+const ROMA = {
+  あ: "a", い: "i", う: "u", え: "e", お: "o", か: "ka", き: "ki", く: "ku", け: "ke", こ: "ko",
+  さ: "sa", し: "shi", す: "su", せ: "se", そ: "so", た: "ta", ち: "chi", つ: "tsu", て: "te", と: "to",
+  な: "na", に: "ni", ぬ: "nu", ね: "ne", の: "no", は: "ha", ひ: "hi", ふ: "fu", へ: "he", ほ: "ho",
+  ま: "ma", み: "mi", む: "mu", め: "me", も: "mo", や: "ya", ゆ: "yu", よ: "yo",
+  ら: "ra", り: "ri", る: "ru", れ: "re", ろ: "ro", わ: "wa", を: "o", ん: "n",
+  が: "ga", ぎ: "gi", ぐ: "gu", げ: "ge", ご: "go", ざ: "za", じ: "ji", ず: "zu", ぜ: "ze", ぞ: "zo",
+  だ: "da", ぢ: "ji", づ: "zu", で: "de", ど: "do", ば: "ba", び: "bi", ぶ: "bu", べ: "be", ぼ: "bo",
+  ぱ: "pa", ぴ: "pi", ぷ: "pu", ぺ: "pe", ぽ: "po", ゔ: "vu",
+};
+const SMALL_Y = { ゃ: "a", ゅ: "u", ょ: "o" }, SMALL_V = { ぁ: "a", ぃ: "i", ぅ: "u", ぇ: "e", ぉ: "o" };
+const toHira = (s) => [...s].map((c) => { const k = c.codePointAt(0); return k >= 0x30a1 && k <= 0x30f6 ? String.fromCodePoint(k - 0x60) : c; }).join("");
+const toKata = (s) => [...s].map((c) => { const k = c.codePointAt(0); return k >= 0x3041 && k <= 0x3096 ? String.fromCodePoint(k + 0x60) : c; }).join("");
+// Greetings whose last は is said "wa", which spelling alone can't tell.
+const ROMA_WORDS = { こんにちは: "konnichiwa", こんばんは: "konbanwa" };
+// Hepburn-style romaji; long vowels are written as they are spelled (がっこう → gakkou, コーヒー → koohii).
+function kanaToRomaji(s) {
+  if (ROMA_WORDS[s]) return ROMA_WORDS[s];
+  const h = [...toHira(s)];
+  let out = "", dbl = false;
+  for (let i = 0; i < h.length; i++) {
+    const c = h[i], next = h[i + 1];
+    if (c === "っ") { dbl = true; continue; }
+    if (c === "ー") { const v = out.match(/[aeiou]$/); out += v ? v[0] : ""; continue; }
+    let r = ROMA[c];
+    if (r === undefined) { out += c; dbl = false; continue; }
+    if (next && SMALL_Y[next] && r.length > 1 && r.endsWith("i")) {
+      const base = r.slice(0, -1);                       // ki → k, shi → sh, chi → ch, ji → j
+      r = (/(sh|ch|j)$/.test(base) ? base : base + "y") + SMALL_Y[next]; i++;
+    } else if (next && SMALL_V[next]) {
+      r = (c === "う" ? "w" : r.replace(/[aeiou]$/, "")) + SMALL_V[next]; i++;   // ファ fa, ティ ti, ウィ wi
+    }
+    if (dbl) { r = (r.startsWith("ch") ? "t" : r[0]) + r; dbl = false; }
+    out += r;
+  }
+  return out;
+}
+
+const KANA = (() => {
+  const src = (MC_COURSES.ja && MC_COURSES.ja.kana) || { basic: "", dakuten: "", combo: "" };
+  const rows = (t) => t.trim() ? t.trim().split("\n").map((r) => r.trim().split(/\s+/)) : [];
+  const chart = { basic: rows(src.basic), dakuten: rows(src.dakuten), combo: rows(src.combo) };
+  const all = (k) => chart[k].flat().filter((c) => c !== "・");
+  return { chart, basic: all("basic"), full: all("basic").concat(all("dakuten"), all("combo")) };
+})();
+const KANJI = ((MC_COURSES.ja && MC_COURSES.ja.kanji) || "").split("\n").map((l) => l.split("|")).filter((p) => p.length === 4)
+  .map(([k, en, on, kun]) => ({ k, en, on, kun }));
+const playKana = (h) => Voice.clip("k:" + h, h) || Voice.speak(h);
+const playKanji = (j) => Voice.clip("kj:" + j.k, j.k) || Voice.speak(j.k);
+
+function mountKanaQuiz(root) {
+  root.replaceChildren();
+  let mode = "hira", level = "basic", item = null, answered = false, right = 0, asked = 0;
+  const score = el("span", { class: "muted small num" }, "See it, pick the sound");
+  const levelSeg = segmented([["basic", "46 basic"], ["full", "All sounds"]], level, (v) => { level = v; round(); }, "Which kana");
+  const face = el("div", { class: "kana-face", lang: "ja" });
+  const choices = el("div", { class: "choices" });
+  const out = el("div", { class: "result", role: "status" });
+  const next = el("button", { class: "play-big", type: "button", onclick: () => round() }, el("span", {}, "Next"));
+  root.append(
+    el("div", { class: "panel-head" }, el("h3", {}, "Kana and kanji quiz"), score),
+    segmented([["hira", "Hiragana"], ["kata", "Katakana"], ["kanji", "Kanji"]], mode, (v) => { mode = v; levelSeg.hidden = v === "kanji"; round(); }, "What to practise"),
+    levelSeg,
+    el("div", { class: "trainer" }, face, choices, next, out));
+  function round() {
+    answered = false; out.replaceChildren();
+    if (mode === "kanji") {
+      item = pick(KANJI);
+      face.textContent = item.k;
+      const opts = shuffle([item, ...shuffle(KANJI.filter((j) => j.en !== item.en)).slice(0, 3)]);
+      choices.replaceChildren(...opts.map((j) => el("button", { class: "choice", type: "button", onclick: (e) => answer(j === item, e.currentTarget) }, el("span", { class: "choice-en" }, j.en))));
+      return;
+    }
+    const pool = level === "basic" ? KANA.basic : KANA.full;
+    const h = pick(pool), r = kanaToRomaji(h);
+    item = { h, r };
+    face.textContent = mode === "kata" ? toKata(h) : h;
+    const others = shuffle([...new Set(pool.map(kanaToRomaji).filter((x) => x !== r))]).slice(0, 3);
+    choices.replaceChildren(...shuffle([r, ...others]).map((x) => el("button", { class: "choice", type: "button", onclick: (e) => answer(x === r, e.currentTarget) }, el("span", { class: "choice-py" }, x))));
+  }
+  function answer(ok, btn) {
+    if (answered) return;
+    answered = true; asked++; if (ok) right++;
+    btn.classList.add(ok ? "right" : "wrong");
+    score.textContent = right + " of " + asked + " right";
+    Store.bump("kana"); Store.save();
+    if (mode === "kanji") {
+      [...choices.children].find((b) => b.textContent === item.en).classList.add("right");
+      playKanji(item);
+      out.replaceChildren(el("div", { class: "result-card " + (ok ? "is-right" : "is-wrong") },
+        el("p", { class: "label" }, ok ? "Right" : "Not quite"),
+        el("div", { class: "result-word" }, el("span", { class: "han result-hz", lang: "ja" }, item.k), el("button", { class: "speak", type: "button", "aria-label": "Play " + item.k, onclick: () => playKanji(item) }, speakerIcon())),
+        el("p", { class: "result-en" }, item.en),
+        el("p", { class: "muted small" }, "On: " + (item.on || "—") + " · Kun: " + (item.kun || "—"))));
+      return;
+    }
+    [...choices.children].find((b) => b.textContent === item.r).classList.add("right");
+    playKana(item.h);
+    out.replaceChildren(el("div", { class: "result-card " + (ok ? "is-right" : "is-wrong") },
+      el("p", { class: "label" }, ok ? "Right" : "Not quite"),
+      el("div", { class: "result-word" }, el("span", { class: "han result-hz", lang: "ja" }, item.h + " " + toKata(item.h)),
+        el("button", { class: "speak", type: "button", "aria-label": "Play " + item.h, onclick: () => playKana(item.h) }, speakerIcon())),
+      el("p", { class: "result-en" }, item.r)));
+  }
+  round();
+}
+
+function renderKanaCharts(root) {
+  let script = "hira";
+  const host = el("div", { class: "kana-charts" });
+  root.replaceChildren(
+    el("div", { class: "panel-head" }, el("h3", {}, "Kana charts")),
+    el("p", { class: "muted small" }, "Tap any sound to hear it. Hiragana is for Japanese words, katakana for foreign words and names. They share the same sounds."),
+    segmented([["hira", "Hiragana あ"], ["kata", "Katakana ア"]], script, (v) => { script = v; draw(); }, "Script"), host);
+  function grid(rows, cols, title) {
+    const g = el("div", { class: "kana-grid", style: "grid-template-columns: repeat(" + cols + ", minmax(0, 1fr))" });
+    for (const r of rows) for (const c of r) {
+      if (c === "・") { g.append(el("span", { class: "kana-cell empty" })); continue; }
+      g.append(el("button", { class: "kana-cell", type: "button", onclick: () => playKana(c), "aria-label": c + " " + kanaToRomaji(c) },
+        el("span", { class: "kana-ch", lang: "ja" }, script === "kata" ? toKata(c) : c), el("span", { class: "kana-ro" }, kanaToRomaji(c))));
+    }
+    return [el("p", { class: "label" }, title), g];
+  }
+  function draw() {
+    host.replaceChildren(...grid(KANA.chart.basic, 5, "Basic sounds"), ...grid(KANA.chart.dakuten, 5, "With ゛ and ゜ marks"), ...grid(KANA.chart.combo, 3, "Combined sounds"));
+  }
+  draw();
+}
+
+function renderKanjiList(root) {
+  root.replaceChildren(
+    el("div", { class: "panel-head" }, el("h3", {}, "Kanji"), el("span", { class: "chip" }, KANJI.length + " kanji")),
+    el("p", { class: "muted small" }, "The basic kanji of JLPT N5. On readings (katakana) are used in compound words, kun readings (hiragana) when the kanji stands alone. Tap one to hear it."),
+    el("div", { class: "kanji-grid" }, KANJI.map((j) => el("button", { class: "kanji-card", type: "button", onclick: () => playKanji(j), "aria-label": j.k + ", " + j.en },
+      el("span", { class: "kanji-ch", lang: "ja" }, j.k), el("span", { class: "kanji-en" }, j.en),
+      el("span", { class: "kanji-rd", lang: "ja" }, [j.on, j.kun].filter(Boolean).join(" · "))))));
 }
 
 // ---------- practising out loud with classmates ----------
@@ -1594,17 +2992,17 @@ function classmatesPanel() {
   const label = me ? "Invite a classmate" : "Share the app with a friend";
   const btn = el("button", { class: "btn", type: "button" }, label);
   shareButton(btn, () => (me ? APP_URL + "?join=" + me.code : APP_URL),
-    me ? "Join my Mandarin class so we can practise together:" : "Let's learn Mandarin together with this free app:", label);
+    me ? "Join my language class so we can practise together:" : "Let's learn " + COURSE.name + " together with this free app:", label);
   return el("div", { class: "panel" }, el("h3", {}, "Practise with your classmates"),
     el("p", { class: "muted" }, me ? "Pair up with someone from " + (me.className || "your class") + ". Speaking to a real person makes the words stick." : "Studying with a friend keeps you both going. Speaking to a real person makes the words stick."),
     el("ol", { class: "steps" },
       el("li", {}, "Once a week, each of you picks 5 sentences from this drill."),
-      el("li", {}, "Send them to each other as voice messages in Messenger, said in Mandarin."),
-      el("li", {}, "Play your partner's messages and say each sentence back. If a tone sounds different from the recording here, tell them.")),
+      el("li", {}, "Send them to each other as voice messages in Messenger, said in " + COURSE.name + "."),
+      el("li", {}, "Play your partner's messages and say each sentence back. If something sounds different from the recording here, tell them.")),
     btn);
 }
 
-// ---------- speaking drill: read the English, say it in Mandarin out loud, then check against the recording ----------
+// ---------- speaking drill: read the English, say it out loud, then check against the recording ----------
 function mountSpeak(root) {
   root.replaceChildren();
   const stage = currentStage();
@@ -1613,19 +3011,19 @@ function mountSpeak(root) {
   const card = el("div", { class: "card-stage" });
   const count = el("p", { class: "muted small num" });
   root.append(el("div", { class: "panel" },
-    el("div", { class: "split" }, el("h2", {}, "Say it in Mandarin"), el("span", { class: "chip" }, "Stage " + stage)),
-    el("p", { class: "muted" }, "Read the English, say it out loud in Mandarin, then check yourself against the recording. Repeat it after the audio until it sounds the same."),
+    el("div", { class: "split" }, el("h2", {}, "Say it in " + COURSE.name), el("span", { class: "chip" }, "Stage " + stage)),
+    el("p", { class: "muted" }, "Read the English, say it out loud in " + COURSE.name + ", then check yourself against the recording. Repeat it after the audio until it sounds the same."),
     el("div", { class: "split" }, el("p", { class: "label" }, "Speaking drill"), count),
     card));
   root.append(classmatesPanel());
   const go = (d) => { at = (at + d + order.length) % order.length; draw(); };
   function draw() {
-    const [, hz, py, en] = pool[order[at]];
+    const row = pool[order[at]], [, hz, py, en] = row;
     count.textContent = (at + 1) + " of " + order.length;
     const answer = el("div", { class: "answer" });
     const check = el("button", { class: "btn primary big", type: "button", onclick: () => {
       shown = true; Store.bump("talk"); Store.save();
-      answer.replaceChildren(hanziEl(hz, py, "han meaning"), pinyinEl(py), el("div", { class: "row" },
+      answer.replaceChildren(hanziEl(hz, py, "han meaning"), sentenceReading(row, "pinyin") || "", el("div", { class: "row" },
         el("button", { class: "btn play", type: "button", onclick: () => Voice.say(hz) }, speakerIcon(), "Play again"),
         el("button", { class: "btn", type: "button", onclick: () => Voice.say(hz, 0.55) }, "Slow recording")));
       check.hidden = true;
@@ -1677,7 +3075,7 @@ function setupInstall() {
 // Phone share sheet when there is one, otherwise copy the link.
 async function shareLink(url, text) {
   if (navigator.share) {
-    try { await navigator.share({ title: "Mandarin Coach", text, url }); return "shared"; }
+    try { await navigator.share({ title: "Language Coach", text, url }); return "shared"; }
     catch (e) { if (e && e.name === "AbortError") return "cancelled"; }
   }
   try { await navigator.clipboard.writeText(url); return "copied"; } catch { return "failed"; }
@@ -1690,13 +3088,30 @@ function shareButton(btn, url, text, label) {
   });
 }
 function setupShare() {
-  shareButton($("#btn-share"), () => APP_URL, "I'm learning Mandarin with this free app: flashcards with real audio, a tone trainer and speaking practice.", "Share app");
+  shareButton($("#btn-share"), () => APP_URL, "I'm learning languages with this free app: Mandarin, Spanish and Japanese, with real recorded audio and speaking practice.", "Share app");
 }
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 
 // ---------- sharing progress with a coach (Supabase; only for learners who join a class) ----------
 const isoDay = (n) => { const d = dayDate(n); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const randomToken = () => [...crypto.getRandomValues(new Uint8Array(24))].map((b) => b.toString(16).padStart(2, "0")).join("");
+// One course's totals from its saved progress (works for courses not loaded on this page).
+function courseSummary(S) {
+  const t = dayNum(), days = [], cards = Object.entries(S.cards || {}), sessions = S.sessions || [], act = S.activity || {};
+  for (let d = t - 13; d <= t; d++) {
+    const a = act[d] || {};
+    days.push([sessions.filter((s) => s.d === d).reduce((m, s) => m + (s.min || 0), 0), (a.rev || 0) + (a.add || 0)]);
+  }
+  const tone = Object.values(S.toneStats || {}).reduce((acc, v) => ({ n: acc.n + v.n, ok: acc.ok + v.ok }), { n: 0, ok: 0 });
+  const active = Object.keys(act).map(Number).concat(sessions.map((s) => s.d));
+  const words = cards.filter(([id]) => !id.startsWith("c:")).length;
+  return {
+    stage: words < 150 ? 1 : words < 300 ? 2 : 3, learned: cards.length, known: cards.filter(([, c]) => (c.ivl || 0) >= 21).length,
+    sessions: sessions.filter((s) => s.plan !== "review").length, minutes: sessions.reduce((m, s) => m + (s.min || 0), 0),
+    lastDay: active.length ? isoDay(Math.max(...active)) : null, today: isoDay(t), days,
+    tone: tone.n ? Math.round((100 * tone.ok) / tone.n) : null,
+  };
+}
 const Cloud = {
   ready: () => !!(window.MC_CLOUD && MC_CLOUD.url && MC_CLOUD.key),
   async rpc(fn, args, keepalive = false) {
@@ -1712,29 +3127,23 @@ const Cloud = {
     if (!r.ok) throw Object.assign(new Error((data && data.message) || "The server answered " + r.status), { status: r.status });
     return data;
   },
-  me: () => Store.state.share || null,          // { code, className, id, token, name, lastSync }
-  // What the coach sees: totals and the last 14 days, never the cards themselves.
+  me: () => Share.get(),          // { code, className, id, token, name, lastSync }
+  // What the coach sees, per language: totals and the last 14 days, never the cards themselves.
   summary() {
-    const S = Store.state, t = dayNum(), days = [];
-    for (let d = t - 13; d <= t; d++) {
-      const a = S.activity[d] || {};
-      days.push([S.sessions.filter((s) => s.d === d).reduce((m, s) => m + (s.min || 0), 0), (a.rev || 0) + (a.add || 0)]);
+    const courses = {};
+    for (const id of Object.keys(COURSE_META)) {
+      let s = null;
+      if (id === CUR) s = Store.state;
+      else try { s = JSON.parse(localStorage.getItem(COURSE_META[id].storeKey) || "null"); } catch {}
+      if (s && (Object.keys(s.cards || {}).length || (s.sessions || []).length)) courses[id] = courseSummary(s);
     }
-    const tone = Object.values(S.toneStats).reduce((acc, v) => ({ n: acc.n + v.n, ok: acc.ok + v.ok }), { n: 0, ok: 0 });
-    const active = Object.keys(S.activity).map(Number).concat(S.sessions.map((s) => s.d));
-    return {
-      v: 1, stage: currentStage(), learned: learned().length, known: known().length,
-      sessions: S.sessions.filter((s) => s.plan !== "review").length, minutes: S.sessions.reduce((m, s) => m + (s.min || 0), 0),
-      lastDay: active.length ? isoDay(Math.max(...active)) : null, today: isoDay(t), days,
-      tone: tone.n ? Math.round((100 * tone.ok) / tone.n) : null,
-    };
+    return { v: 2, courses };
   },
   async className(code) { return this.rpc("mc_class_name", { p_code: code }); },
   async join(code, name) {
     const id = crypto.randomUUID(), token = randomToken();
     const res = await this.rpc("mc_join", { p_code: code, p_learner: id, p_token: token, p_name: name });
-    Store.state.share = { code: code.trim().toUpperCase(), className: res && res.class, id, token, name, lastSync: 0 };
-    Store.save();
+    Share.set({ code: code.trim().toUpperCase(), className: res && res.class, id, token, name, lastSync: 0 });
     await this.sync(true);
   },
   // Throttled to once every 2 minutes unless forced (after a session, when the app is closed).
@@ -1744,16 +3153,15 @@ const Cloud = {
     me.lastSync = Date.now();
     try {
       const ok = await this.rpc("mc_sync", { p_learner: me.id, p_token: me.token, p_summary: this.summary() }, true);
-      if (ok === false) { me.removed = true; }
-      Store.save();
-    } catch { me.lastSync = 0; }
+      if (ok === false) me.removed = true;
+      Share.set(me);
+    } catch { me.lastSync = 0; Share.set(me); }
   },
   async leave() {
     const me = this.me();
     if (!me) return;
     try { await this.rpc("mc_leave", { p_learner: me.id, p_token: me.token }); } catch {}
-    delete Store.state.share;
-    Store.save();
+    Share.set(null);
   },
 };
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") Cloud.sync(true); });
@@ -1763,7 +3171,7 @@ function joinPanel(code, onDone) {
   const panel = el("div", { class: "panel join" });
   const name = el("input", { type: "text", id: "join-name", maxlength: 40, placeholder: "Your first name", autocomplete: "given-name" });
   const msg = el("p", { class: "small", role: "status" });
-  const title = el("h2", {}, "Join a Mandarin class");
+  const title = el("h2", {}, "Join a language class");
   Cloud.className(code).then((n) => { if (n) title.textContent = "Join " + n; else msg.textContent = "This invite code doesn't exist. Ask for a new link."; }).catch(() => {});
   const form = el("form", { class: "row", onsubmit: async (e) => {
     e.preventDefault();
@@ -1872,7 +3280,7 @@ function renderCoach(root) {
   if (!creds) return coachSignIn(root);
   const invite = APP_URL + "?join=" + creds.code;
   const shareBtn = el("button", { class: "btn primary", type: "button" }, "Share invite link");
-  shareButton(shareBtn, () => invite, "Join my Mandarin class. Open this link, tap Join, and I can follow your progress:", "Share invite link");
+  shareButton(shareBtn, () => invite, "Join my language class. Open this link, tap Join, and I can follow your progress:", "Share invite link");
   const qr = el("div", { class: "qr", "aria-label": "QR code of the invite link" });
   loadQR(invite, qr);
   const list = el("div", { class: "panel" }, el("p", { class: "muted" }, "Loading your learners…"));
@@ -1892,28 +3300,37 @@ function renderCoach(root) {
         el("button", { class: "btn", type: "button", onclick: load }, "Try again"));
     }
   }
+  // Summaries hold one entry per language studied (older app versions sent Mandarin only).
+  const coursesOf = (r) => { const s = r.summary || {}; return s.courses || (s.learned != null ? { zh: s } : {}); };
+  const lastOf = (r) => Object.values(coursesOf(r)).map((c) => c.lastDay).filter(Boolean).sort().pop() || null;
+  function courseBlock(id, s) {
+    const m = COURSE_META[id] || { native: id, name: id };
+    return el("div", { class: "learner-course" },
+      el("div", { class: "split" }, el("div", { class: "row" }, el("b", {}, m.native + " " + m.name), el("span", { class: "chip" }, "Stage " + (s.stage || 1))), lastSeen(s)),
+      el("div", { class: "stats" },
+        el("div", { class: "stat" }, el("span", { class: "label" }, "Words learned"), el("b", {}, s.learned ?? 0)),
+        el("div", { class: "stat" }, el("span", { class: "label" }, "Known well"), el("b", {}, s.known ?? 0)),
+        el("div", { class: "stat" }, el("span", { class: "label" }, "Sessions"), el("b", {}, s.sessions ?? 0)),
+        el("div", { class: "stat" }, el("span", { class: "label" }, "Hours"), el("b", {}, ((s.minutes || 0) / 60).toFixed(1)))),
+      el("div", { class: "split" }, el("div", {}, el("p", { class: "label" }, "Cards per day, last 14 days"), dayBars(s)),
+        s.tone != null ? el("p", { class: "muted small" }, "Tone game: " + s.tone + "% right") : null));
+  }
   function drawLearners(rows) {
-    rows.sort((a, b) => (daysAgo(a.summary.lastDay) ?? 999) - (daysAgo(b.summary.lastDay) ?? 999));
-    const week = rows.filter((r) => (daysAgo(r.summary.lastDay) ?? 999) < 7).length;
+    rows.sort((a, b) => (daysAgo(lastOf(a)) ?? 999) - (daysAgo(lastOf(b)) ?? 999));
+    const week = rows.filter((r) => (daysAgo(lastOf(r)) ?? 999) < 7).length;
     list.replaceChildren(
       el("div", { class: "split" }, el("h3", {}, rows.length + (rows.length === 1 ? " learner" : " learners") + " · " + week + " studied this week"),
         el("button", { class: "btn small", type: "button", onclick: load }, "Refresh")),
       ...(rows.length ? [] : [el("p", { class: "muted" }, "Nobody has joined yet. Share your invite link to get started.")]),
       ...rows.map((r) => {
-        const s = r.summary || {}, sure = el("div", { class: "row", hidden: true },
+        const cs = Object.entries(coursesOf(r)), sure = el("div", { class: "row", hidden: true },
           el("span", { class: "small" }, "Remove " + r.name + " from your class?"),
           el("button", { class: "btn small", type: "button", onclick: async () => { await Cloud.rpc("mc_coach_remove", { p_code: creds.code, p_key: creds.key, p_learner: r.id }).catch(() => {}); load(); } }, "Remove"),
           el("button", { class: "btn small ghost", type: "button", onclick: () => (sure.hidden = true) }, "Cancel"));
         return el("div", { class: "learner" },
-          el("div", { class: "split" }, el("div", { class: "row" }, el("b", { class: "learner-name" }, r.name), s.stage ? el("span", { class: "chip" }, "Stage " + s.stage) : null), lastSeen(s)),
-          el("div", { class: "stats" },
-            el("div", { class: "stat" }, el("span", { class: "label" }, "Words learned"), el("b", {}, s.learned ?? 0)),
-            el("div", { class: "stat" }, el("span", { class: "label" }, "Known well"), el("b", {}, s.known ?? 0)),
-            el("div", { class: "stat" }, el("span", { class: "label" }, "Sessions"), el("b", {}, s.sessions ?? 0)),
-            el("div", { class: "stat" }, el("span", { class: "label" }, "Hours"), el("b", {}, ((s.minutes || 0) / 60).toFixed(1)))),
-          el("div", { class: "split" }, el("div", {}, el("p", { class: "label" }, "Cards per day, last 14 days"), dayBars(s)),
-            el("p", { class: "muted small" }, (s.tone != null ? "Tone game: " + s.tone + "% right · " : "") + "Joined " + new Date(r.joined_at).toLocaleDateString() +
-              " · updated " + new Date(r.updated_at).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))),
+          el("div", { class: "split" }, el("b", { class: "learner-name" }, r.name),
+            el("p", { class: "muted small" }, "Joined " + new Date(r.joined_at).toLocaleDateString() + " · updated " + new Date(r.updated_at).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))),
+          ...(cs.length ? cs.map(([id, s]) => courseBlock(id, s)) : [el("p", { class: "muted small" }, "Hasn't studied yet.")]),
           el("button", { class: "btn small ghost", type: "button", onclick: () => (sure.hidden = false) }, "Remove from class"), sure);
       }));
   }
@@ -1921,21 +3338,26 @@ function renderCoach(root) {
 }
 
 // ---------- the session plan ----------
+// Each block's small label is in the language being learned (COURSE.blocks).
 const BLOCKS = {
-  review: { title: "Flashcard review", zh: "复习", tip: "Old words first. Say the pinyin and the meaning out loud before you check." },
-  tones: { title: "Tones and shadowing", zh: "声调", tip: "Train your ear, then shadow sentences: play, pause, repeat out loud copying the melody." },
-  lesson: { title: "New lesson", zh: "新课", tip: "Do one lesson in your main course. Write down every new word, and add the useful ones on the Words tab." },
-  break: { title: "Break", zh: "休息", tip: "Stand up, drink some water, look away from the screen." },
-  input: { title: "Listen or read", zh: "听和读", tip: "Pick something at your level. Understanding most of it is the goal, so go easier if you're lost." },
-  speak: { title: "Speak", zh: "说话", tip: "Say each sentence out loud in Mandarin before you check it, then repeat it after the recording." },
-  new: { title: "Learn new words", zh: "生词", tip: "Today's new words. Repeat each one after the audio." },
+  review: { title: "Flashcard review", tip: CUR === "es" ? "Old words first. Say the meaning out loud before you check." : CUR === "ja" ? "Old words first. Say the reading and the meaning out loud before you check." : "Old words first. Say the pinyin and the meaning out loud before you check." },
+  tones: { title: "Tones and shadowing", tip: "Train your ear, then shadow sentences: play, pause, repeat out loud copying the melody." },
+  kana: { title: "Kana and kanji", tip: "Quiz yourself on hiragana, katakana or kanji. Say each sound out loud." },
+  lesson: { title: "New lesson", tip: "Do one lesson in your main course. Write down every new word, and add the useful ones on the Words tab." },
+  break: { title: "Break", tip: "Stand up, drink some water, look away from the screen." },
+  input: { title: "Listen or read", tip: "Pick something at your level. Understanding most of it is the goal, so go easier if you're lost." },
+  speak: { title: "Speak", tip: "Say each sentence out loud in " + COURSE.name + " before you check it, then repeat it after the recording." },
+  new: { title: "Learn new words", tip: "Today's new words. Repeat each one after the audio." },
 };
+for (const [id, b] of Object.entries(BLOCKS)) b.zh = COURSE.blocks[id] || "";
 const PLANS = {
-  full: { name: "90-minute session", blocks: [["review", 10], ["tones", 10], ["lesson", 25], ["break", 5], ["input", 20], ["speak", 15], ["new", 5]] },
+  full: { name: "90-minute session", blocks: { zh: [["review", 10], ["tones", 10], ["lesson", 25], ["break", 5], ["input", 20], ["speak", 15], ["new", 5]],
+    ja: [["review", 10], ["kana", 10], ["lesson", 25], ["break", 5], ["input", 20], ["speak", 15], ["new", 5]],
+    es: [["review", 10], ["lesson", 25], ["break", 5], ["input", 20], ["speak", 25], ["new", 5]] }[CUR] },
   short: { name: "45-minute session", blocks: [["review", 10], ["lesson", 20], ["speak", 10], ["new", 5]] },
   review: { name: "10-minute review", blocks: [["review", 10]] },
 };
-const RUN_KEY = "mandarin-coach-running";
+const RUN_KEY = COURSE.runKey;
 const readRun = () => { try { return JSON.parse(localStorage.getItem(RUN_KEY) || "null"); } catch { return null; } };
 const writeRun = (r) => { try { r ? localStorage.setItem(RUN_KEY, JSON.stringify(r)) : localStorage.removeItem(RUN_KEY); } catch {} };
 let RUN = readRun(), tick = 0;
@@ -1953,8 +3375,8 @@ function blockPlanList(planKey, active) {
     const from = at; at += min;
     return el("li", { class: "block" + (active == null ? "" : i < active ? " done" : i === active ? " now" : "") },
       el("span", { class: "when" }, from + "–" + at + " min"),
-      el("span", {}, el("span", { class: "han", lang: "zh-CN" }, BLOCKS[id].zh), " ", BLOCKS[id].title),
-      el("span", { class: "muted small" }, ["review", "tones", "speak", "new"].includes(id) ? "in the app" : id === "break" ? "" : "outside"));
+      el("span", {}, el("span", { class: "han", lang: COURSE.lang }, BLOCKS[id].zh), " ", BLOCKS[id].title),
+      el("span", { class: "muted small" }, ["review", "tones", "kana", "speak", "new"].includes(id) ? "in the app" : id === "break" ? "" : "outside"));
   }));
 }
 
@@ -1983,16 +3405,19 @@ function renderToday(root) {
       el("button", { class: "btn", type: "button", onclick: () => start("short") }, "45-minute version"),
       el("button", { class: "btn" + (type !== "session" ? " primary big" : ""), type: "button", onclick: () => start("review") }, "10-minute review"))));
   root.append(el("div", { class: "panel" }, el("h3", {}, "How a full session runs"), blockPlanList("full")));
-  if (!S.sessions.length) root.append(el("div", { class: "panel" },
-    el("h3", {}, "Weeks 1 and 2: tones first"),
-    el("p", {}, "Spend most of your first sessions on pinyin and the four tones. Use the ear trainer on the Tones tab and HelloChinese's pinyin lessons. Wrong tones are very hard to unlearn later."),
+  const first = {
+    zh: ["Weeks 1 and 2: tones first", "Spend most of your first sessions on pinyin and the four tones. Use the ear trainer on the Tones tab and HelloChinese's pinyin lessons. Wrong tones are very hard to unlearn later."],
+    ja: ["Weeks 1 and 2: hiragana first", "Learn the 46 hiragana before anything else, then katakana. Use the charts and the quiz on the Kana tab every session. Once you can read kana, every word gets easier."],
+    es: ["Week 1: the sounds of Spanish", "Spanish is read exactly the way it's written. Learn the five vowels (a, e, i, o, u always sound the same) and the letters that differ from English: ñ, ll, rr, j, and h (always silent)."],
+  }[CUR];
+  if (!S.sessions.length) root.append(el("div", { class: "panel" }, el("h3", {}, first[0]), el("p", {}, first[1]),
     el("div", { class: "linkcards" }, MC_DATA.links.tools.map(linkCard))));
   voiceNote(root);
 }
 function linkCard(l) { return el("a", { class: "linkcard", href: l.url, target: "_blank", rel: "noopener" }, el("b", {}, l.name), el("span", { class: "muted small" }, l.note)); }
 function voiceNote(root) {
   if (Voice.hasClips() || !Voice.checked || Voice.voice) return;
-  root.append(el("p", { class: "note" }, "No Mandarin voice found in this browser, so words can't be read aloud yet. On a PC, open this page in Microsoft Edge or Chrome. On Android, open it in Chrome."));
+  root.append(el("p", { class: "note" }, "No " + COURSE.name + " voice found in this browser, so words can't be read aloud yet. On a PC, open this page in Microsoft Edge or Chrome. On Android, open it in Chrome."));
 }
 
 // ---------- session runner ----------
@@ -2000,7 +3425,12 @@ function renderRunner(root) {
   const plan = PLANS[RUN.plan], [id, min] = plan.blocks[RUN.i];
   // A review block with no words due turns into ear training instead of an empty screen.
   const emptyReview = id === "review" && !dueCards().length;
-  const b = emptyReview ? { title: "Ear training", zh: "声调", tip: "No words are due for review today, so use this time to train your ear: listen, then pick the tones." } : BLOCKS[id];
+  const filler = {
+    zh: { title: "Ear training", zh: "声调", tip: "No words are due for review today, so use this time to train your ear: listen, then pick the tones." },
+    ja: { title: "Kana practice", zh: "かな", tip: "No words are due for review today, so use this time on the kana and kanji quiz." },
+    es: { title: "Shadowing", zh: "Repetir", tip: "No words are due for review today, so use this time to shadow sentences: play, pause, repeat out loud." },
+  }[CUR];
+  const b = emptyReview ? filler : BLOCKS[id];
   const timer = el("div", { class: "timer num", role: "timer", "aria-label": "Time left in this block" });
   const fill = el("i"), msg = el("p", { class: "muted small" });
   const pauseBtn = el("button", { class: "btn", type: "button", onclick: () => {
@@ -2026,7 +3456,7 @@ function renderRunner(root) {
   root.append(
     el("div", { class: "panel runner" },
       el("div", { class: "panel-head" }, el("p", { class: "label" }, plan.name + " · " + (RUN.i + 1) + " of " + plan.blocks.length), end),
-      el("h2", {}, el("span", { class: "han", lang: "zh-CN" }, b.zh), " ", b.title),
+      el("h2", {}, el("span", { class: "han", lang: COURSE.lang }, b.zh), " ", b.title),
       el("p", { class: "muted" }, b.tip),
       el("div", { class: "timer-row" }, timer, msg),
       el("div", { class: "bar" }, fill),
@@ -2036,7 +3466,9 @@ function renderRunner(root) {
     el("details", { class: "panel" }, el("summary", {}, "Session plan"), blockPlanList(RUN.plan, RUN.i)));
   update(); tick = setInterval(() => (root.isConnected ? update() : clearInterval(tick)), 1000);
   const panel = (...kids) => el("div", { class: "panel" }, ...kids);
-  if (id === "review" && emptyReview) { const t = panel(); body.append(t); mountToneTrainer(t); }
+  // Practice that fills a review block with nothing due, or time left after reviews.
+  const practise = (t) => (CUR === "zh" ? mountToneTrainer(t) : CUR === "ja" ? mountKanaQuiz(t) : renderShadowing(t, 6));
+  if (id === "review" && emptyReview) { const t = panel(); body.append(t); practise(t); }
   else if (id === "review") {
     // Reviews finished with time left: the ear trainer fills the rest of the block.
     const p = panel(), t = panel();
@@ -2045,15 +3477,16 @@ function renderRunner(root) {
     mountCards(p, "due", () => {
       if (!t.hidden) return;
       t.hidden = false;
-      mountToneTrainer(t);
-      t.prepend(el("p", { class: "note" }, "Reviews done with time to spare. Train your ear until the timer runs out."));
+      practise(t);
+      t.prepend(el("p", { class: "note" }, "Reviews done with time to spare. Keep practising until the timer runs out."));
     });
   }
   else if (id === "new") { const p = panel(); body.append(p); mountCards(p, "new"); }
   else if (id === "tones") { const a = panel(), s = panel(); body.append(a, s); mountToneTrainer(a); renderShadowing(s, 5); }
+  else if (id === "kana") { const a = panel(); body.append(a); mountKanaQuiz(a); }
   else if (id === "speak") { const p = el("div", { class: "view" }); body.append(p); mountSpeak(p); }
   else if (id === "lesson" || id === "input") body.append(panel(el("h3", {}, id === "lesson" ? "Your main course" : "Listening and reading"), el("div", { class: "linkcards" }, MC_DATA.links[id].map(linkCard)),
-    id === "lesson" ? el("p", { class: "muted small" }, "Months 1–3: HelloChinese. From month 4: Chinese Zero to Hero's HSK courses (HSK 2, then 3).") : el("p", { class: "muted small" }, "Months 1–2: Du Chinese's easiest stories. Add Mandarin Corner from month 3.")));
+    el("p", { class: "muted small" }, id === "lesson" ? COURSE.lessonNote : COURSE.inputNote)));
   document.dispatchEvent(new Event("mc:render"));
 }
 function finishRun(root) {
@@ -2161,15 +3594,25 @@ function renderProgress(root) {
 const VIEWS = {
   today: renderToday,
   cards: (r) => { r.replaceChildren(speedControl(null)); const p = el("div", { class: "panel" }), q = el("div", { class: "panel" }); r.append(p, q); mountCards(p, "due"); q.append(el("h3", {}, "Learn new words"), el("p", { class: "muted" }, "Normally part of each session. Start here if you want extra."), el("button", { class: "btn", type: "button", onclick: () => mountCards(q, "new") }, "Learn " + Store.state.settings.newPerSession + " new words")); },
-  tones: (r) => { r.replaceChildren(speedControl(null)); const a = el("div", { class: "panel" }), b = el("div", { class: "panel" }), c = el("div", { class: "panel" }); r.append(a, b, c); mountToneTrainer(a); renderTonePairs(b); renderShadowing(c); },
-  speak: (r) => { mountSpeak(r); r.prepend(speedControl(null)); },
+  // The third tab: tones for Mandarin, kana and kanji for Japanese (Spanish has none).
+  script: (r) => {
+    r.replaceChildren(speedControl(null));
+    const a = el("div", { class: "panel" }), b = el("div", { class: "panel" }), c = el("div", { class: "panel" });
+    r.append(a, b, c);
+    if (CUR === "ja") { mountKanaQuiz(a); renderKanaCharts(b); renderKanjiList(c); }
+    else { mountToneTrainer(a); renderTonePairs(b); renderShadowing(c); }
+  },
+  speak: (r) => {
+    mountSpeak(r); r.prepend(speedControl(null));
+    if (CUR !== "zh") { const s = el("div", { class: "panel" }); r.insertBefore(s, r.lastChild); renderShadowing(s); }   // Mandarin has these on the Tones tab
+  },
   words: (r) => { renderWords(r); r.prepend(speedControl(null)); },
   progress: renderProgress,
   coach: renderCoach,
 };
 let CURRENT = "today", JOIN_PANEL = null;
 function show(name, keepHash) {
-  if (!VIEWS[name]) name = "today";
+  if (!VIEWS[name] || (name === "script" && !COURSE.script)) name = "today";
   CURRENT = name;
   document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.view === name)));
   document.querySelectorAll(".view").forEach((v) => (v.hidden = v.id !== "view-" + name));
@@ -2183,7 +3626,17 @@ function topStatus() {
   const n = learned().length, type = dayType();
   $("#top-status").textContent = "Stage " + currentStage() + " · " + n + (n === 1 ? " word · " : " words · ") + (RUN ? "session in progress" : type === "session" ? "session day" : type === "off" ? "off day: 10-minute review" : "done for today");
 }
-document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => { show(t.dataset.view); window.scrollTo({ top: 0 }); }));
+document.querySelectorAll(".tab").forEach((t) => {
+  t.addEventListener("click", () => { show(t.dataset.view); window.scrollTo({ top: 0 }); });
+  if (COURSE.tabs[t.dataset.view]) t.querySelector(".han").textContent = COURSE.tabs[t.dataset.view];   // labels in the language being learned
+  t.querySelector(".han").lang = COURSE.lang;
+});
+$("#tab-script").hidden = !COURSE.script;
+$("#tab-script span:last-child").textContent = CUR === "ja" ? "Kana" : "Tones";
+// The language switch: each language keeps its own progress, so switching just reloads the page into it.
+const courseSelect = $("#course-select");
+for (const m of Object.values(COURSE_META)) courseSelect.append(el("option", { value: m.id, selected: m.id === CUR }, m.native + " " + m.name));
+courseSelect.addEventListener("change", () => { try { localStorage.setItem(COURSE_KEY, courseSelect.value); } catch {} location.reload(); });
 document.addEventListener("mc:render", topStatus);
 document.addEventListener("mc:voices", () => { if (CURRENT === "today" && !RUN && !Voice.hasClips()) show("today"); });
 

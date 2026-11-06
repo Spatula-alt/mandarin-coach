@@ -1,7 +1,7 @@
 {
-  "name": "Mandarin Coach",
-  "short_name": "Mandarin",
-  "description": "Learn Mandarin in 90-minute sessions: flashcards with recorded audio, a tone trainer and speaking practice.",
+  "name": "Language Coach",
+  "short_name": "Lang Coach",
+  "description": "Learn Mandarin, Spanish or Japanese in 90-minute sessions: flashcards with recorded audio, tone and kana trainers, and speaking practice.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
